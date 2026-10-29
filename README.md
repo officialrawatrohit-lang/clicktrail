@@ -20,18 +20,21 @@ A clickable demo of a post-click reporting product for e-commerce founders. It's
 ## How to run the demo for a founder
 
 1. Open the link. You land on **Integrations**.
-2. Click **Connect** on Google Ads, Meta Ads, Shopify and GA4. Each one shows a permissions screen, an authorizing step, an account picker and a data import. (All simulated.)
-3. Click **View report** → the **Post-click report**: KPIs, the click → order journey with the biggest leak highlighted, trend chart, Google vs Meta, campaigns (click a row to filter), landing pages, mobile vs desktop.
-4. Use the filters: date range, channel, campaign, device, landing page.
-5. Click **Ask AI about your report** (bottom right) or **Ask AI** in the sidebar and ask questions, e.g.
-   - Where am I losing customers after the click?
-   - Which campaign should I scale? / Which campaign is wasting money?
-   - Google vs Meta — which is better?
-   - Why is my Meta ROAS dropping?
-   - How is mobile checkout doing? / Which landing page is hurting me?
-   - Summary of yesterday / What should I fix first?
-   The assistant answers from the same numbers as the report and respects the active filters.
-6. **WhatsApp reports** shows the daily report as it would arrive on the phone.
+2. Click **Connect** on Google Ads, Meta Ads, Shopify and GA4. Each shows read-only permissions, an authorizing step, an account picker and a data import. (All simulated.)
+3. **Post-click report:** KPIs (revenue from Shopify), the click → order journey with the biggest leak in red, **Ad platforms vs Shopify** (what Meta/Google claim vs what Shopify confirms, platform ROAS vs true ROAS), trend, campaigns, landing pages, mobile vs desktop.
+4. Filters: date range (incl. **Today so far**), channel, campaign, device, landing page.
+5. **WhatsApp reports** — the core of the pitch:
+   - The bot inside the team group: morning recap (total spend across channels, Shopify sales, true ROAS, overclaim, biggest leak), an alert, a team member asking a question.
+   - **Type into the phone** to ask live, e.g. "aaj ka spend?" or "which channel is overclaiming?".
+   - **How often it posts:** auto by spend (3x a day above ₹50k/day, otherwise morning + evening), or pick 3x / morning+evening / evening only.
+   - **When to raise an alert:** "learn this brand's normal" vs "fixed rules" (with your thresholds). It shows how many alerts each would have sent last week, so the founder can see why learning mode means fewer false alarms.
+6. **Ask AI** (sidebar or bottom-right button) — same brain as the WhatsApp bot. Questions from the call:
+   - What's today's spend and sales across all channels?
+   - Which channel is overclaiming vs Shopify? / Meta says 100 orders but Shopify shows 60, why?
+   - What happened after people clicked?
+   - Is anything wrong right now?
+   - How do we compare with similar brands?
+   Plus: which campaign to scale or cut, Meta ROAS drop, mobile checkout, landing pages, summary of yesterday, what to fix first. Every answer shows its data source.
 7. To start fresh before the next demo: **Settings → Reset**, or open the link with `?reset` at the end.
 
 ## Customising

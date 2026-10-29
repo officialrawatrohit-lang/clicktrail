@@ -252,6 +252,32 @@ td .cn{display:flex;align-items:center;gap:8px;font-weight:550}
 .tog::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
 .tog.on{background:var(--good)}.tog.on::after{left:18px}
 
+.src{margin-top:8px;font-size:11px;color:var(--ink3);border-top:1px dashed var(--line);padding-top:6px}
+.wa .src{border-color:#e5e7eb}
+.wa table{font-size:11px;border-collapse:collapse;margin:4px 0;width:100%}
+.wa th,.wa td{padding:3px 4px;border-bottom:1px solid #eee;text-align:right;white-space:nowrap;background:none}
+.wa th:first-child,.wa td:first-child{text-align:left}
+.wa ul,.wa ol{margin:2px 0;padding-left:16px}.wa p{margin:0 0 4px}
+.wa .act{margin-top:4px;font-size:11.5px;background:#f6f6f6;border-radius:6px;padding:5px 7px}
+.wa .who{display:block;font-size:11.5px;font-weight:700;margin-bottom:2px}
+.wa .tw{overflow-x:auto}
+.wa-day{align-self:center;background:#fff;border-radius:7px;padding:3px 10px;font-size:11px;color:#54656f;box-shadow:0 1px 1px rgba(0,0,0,.06)}
+.wa-sys{align-self:center;background:#fff7d6;border-radius:7px;padding:4px 10px;font-size:11px;color:#54656f;text-align:center}
+.phone .pb{max-height:600px;overflow-y:auto}
+.wa-in{display:flex;gap:6px;padding:8px;background:#f0f2f5}
+.wa-in input{flex:1;border:0;border-radius:20px;padding:9px 12px;font-size:13px;min-width:0}
+.wa-in button{border:0;background:var(--wa-dark);color:#fff;border-radius:50%;width:38px;height:38px;cursor:pointer;flex:none}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;margin-bottom:8px}
+.opt.on{border-color:var(--brand);background:var(--brand-soft)}
+.opt input{margin-top:3px;accent-color:var(--brand)}
+.opt b{display:block;font-size:13.5px}.opt span{font-size:12.5px;color:var(--ink2)}
+.ths{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 10px}
+.ths label{font-size:12px;color:var(--ink2);display:flex;flex-direction:column;gap:4px}
+.ths input{border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
+.alist{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-direction:column;gap:6px;font-size:12.5px}
+.alist li{display:flex;gap:8px;align-items:baseline}
+.alist .when{color:var(--ink3);font-size:11.5px;min-width:64px}
+.bigcount{font-size:26px;font-weight:700}
 .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:#0f172a;color:#fff;padding:10px 16px;border-radius:10px;font-size:13.5px;opacity:0;transition:all .2s;z-index:200;pointer-events:none;max-width:90vw}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .scrim{display:none}
@@ -397,18 +423,22 @@ const BENCH = {landRate:.85, pvRate:.6, atcRate:.11, coRate:.5, purRate:.6};
 
 const DAYS = 180;
 const TODAY = new Date(); TODAY.setHours(0,0,0,0);
-const ROWS = [];
-for (let d = DAYS-1; d >= 0; d--) {          // d = days ago, 0 = yesterday
+const NOW = new Date();
+const FRAC = Math.max(0.15, (NOW.getHours() + NOW.getMinutes()/60) / 24);   // share of today elapsed
+const ROWS = [], OTHER = {};   // OTHER = Shopify orders not from ad clicks (organic, direct, WhatsApp, email)
+for (let d = DAYS-1; d >= -1; d--) {          // d = days ago, 0 = yesterday, -1 = today so far
   const date = new Date(TODAY); date.setDate(date.getDate()-d-1);
   const dow = date.getDay(), weekend = dow===0||dow===6;
   const festive = d < 24 ? 1 + (24-d)/24*0.45 : 1;
   const growth = 0.86 + (DAYS-d)/DAYS*0.14;
+  const part = d === -1 ? FRAC : 1;
+  { const n = 0.85 + rnd()*0.3, o = 13 * growth * (1 + (festive-1)*0.5) * n * part; OTHER[d] = {orders:o, revenue:o*1720*(0.9+rnd()*0.2)}; }
   for (const c of CAMPAIGNS) {
     const n = () => 0.88 + rnd()*0.24;
     const fest = c.festive ? festive : 1 + (festive-1)*0.35;
-    const spend = c.spend * fest * growth * (weekend && c.ch==='meta' ? 1.08 : 1) * n();
+    const spend = c.spend * fest * growth * (weekend && c.ch==='meta' ? 1.08 : 1) * n() * part;
     let cpc = c.cpc * n(), cvrMult = (weekend ? 1.05 : 1) * (c.festive ? 1+(festive-1)*0.3 : 1);
-    if (c.fatigue && d < 12) { const f = (12-d)/12; cpc *= 1 + 0.38*f; cvrMult *= 1 - 0.45*f; }
+    if (c.fatigue && d < 12) { const f = Math.min(1,(12-d)/12); cpc *= 1 + 0.38*f; cvrMult *= 1 - 0.45*f; }
     const clicks = spend / cpc;
     for (const dev of ['mobile','desktop']) {
       const m = DEV[dev], share = dev==='mobile' ? c.mob : 1-c.mob;
@@ -419,20 +449,26 @@ for (let d = DAYS-1; d >= 0; d--) {          // d = days ago, 0 = yesterday
       const co = atc * Math.min(.9, c.co*m.co*n());
       const orders = co * Math.min(.95, c.pur*m.pur*n()*Math.sqrt(cvrMult));
       const revenue = orders * c.aov * (dev==='desktop'?1.12:1) * n();
-      ROWS.push({d, t:date.getTime(), c:c.id, ch:c.ch, dev, lp:c.lp, spend:spend*share, clicks:ck, landed, pv, atc, co, orders, revenue, newOrders:orders*c.nw});
+      const claimF = (c.ch==='meta' ? 1.62 : 1.22) * n();   // what the ad platform reports vs Shopify-matched orders
+      ROWS.push({d, t:date.getTime(), c:c.id, ch:c.ch, dev, lp:c.lp, spend:spend*share, clicks:ck, landed, pv, atc, co, orders, revenue, newOrders:orders*c.nw, claimed:orders*claimF, claimedRev:revenue*claimF});
     }
   }
 }
+
+const BYDAY = {}; for (const r of ROWS) (BYDAY[r.d] ||= []).push(r);
+const BENCH_PEERS = {roas:3.2, cvr:.016, landRate:.85, aov:1850, cpo:560, coRate:.5, purRate:.6};
 
 /* =========================================================
    STATE
    ========================================================= */
 const KEY = 'clicktrail_demo_v1';
-const DEFAULT_STATE = () => ({view:'integrations', connected:{}, accounts:{}, filters:{range:30,channel:'all',campaign:'all',device:'all',lp:'all'}, trend:'rev', sort:{key:'spend',dir:-1}, chat:[], wa:{daily:true,weekly:true,alerts:true}, syncedAt:Date.now()});
+const DEFAULT_STATE = () => ({view:'integrations', connected:{}, accounts:{}, filters:{range:30,channel:'all',campaign:'all',device:'all',lp:'all'}, trend:'rev', sort:{key:'spend',dir:-1}, chat:[], wa:{freq:'auto', mode:'learn', th:{roas:2, spend:40, gap:30}, weekly:true}, syncedAt:Date.now()});
 let state;
 try { state = JSON.parse(localStorage.getItem(KEY)) || DEFAULT_STATE(); } catch(e) { state = DEFAULT_STATE(); }
 if (location.search.includes('reset')) { state = DEFAULT_STATE(); history.replaceState(null,'',location.pathname); }
 if (state.storeName) CONFIG.storeName = state.storeName;
+state.wa = Object.assign({freq:'auto', mode:'learn', th:{roas:2, spend:40, gap:30}, weekly:true}, state.wa||{});
+if (!state.wa.th) state.wa.th = {roas:2, spend:40, gap:30};
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
 
 const adChans = () => ['google','meta'].filter(k => state.connected[k]);
@@ -448,18 +484,20 @@ const fmtINR = v => v >= 1e7 ? '₹'+(v/1e7).toFixed(2)+' Cr' : v >= 1e5 ? '₹'
 const pct = (v,d=1) => (v*100).toFixed(d)+'%';
 const x2 = v => v.toFixed(2)+'x';
 const fmtDate = t => new Date(t).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
-const RANGE_LABEL = {1:'Yesterday',7:'Last 7 days',14:'Last 14 days',30:'Last 30 days',90:'Last 90 days'};
+const RANGE_LABEL = {0:'Today so far',1:'Yesterday',7:'Last 7 days',14:'Last 14 days',30:'Last 30 days',90:'Last 90 days'};
 const chName = k => k==='google' ? 'Google Ads' : 'Meta Ads';
 const chColor = k => SOURCES[k].color;
 
 function filterRows(f, period=0, R=f.range, ignoreDate=false) {
-  const ch = adChans(), lo = period*R, hi = lo+R;
+  const ch = adChans();
+  let lo = period*R, hi = lo+R;
+  if (R === 0) { lo = period===0 ? -1 : 0; hi = lo+1; }
   return ROWS.filter(r => (ignoreDate || (r.d>=lo && r.d<hi)) && ch.includes(r.ch)
     && (f.channel==='all'||r.ch===f.channel) && (f.campaign==='all'||r.c===f.campaign)
     && (f.device==='all'||r.dev===f.device) && (f.lp==='all'||r.lp===f.lp));
 }
 function agg(rows) {
-  const s = {spend:0,clicks:0,landed:0,pv:0,atc:0,co:0,orders:0,revenue:0,newOrders:0};
+  const s = {spend:0,clicks:0,landed:0,pv:0,atc:0,co:0,orders:0,revenue:0,newOrders:0,claimed:0,claimedRev:0};
   for (const r of rows) for (const k in s) s[k] += r[k];
   return derive(s);
 }
@@ -476,7 +514,31 @@ function derive(s) {
   s.coRate = s.atc ? s.co/s.atc : 0;
   s.purRate = s.co ? s.orders/s.co : 0;
   s.bounce = s.landed ? 1 - s.pvRate : 0;
+  s.platRoas = s.spend ? s.claimedRev/s.spend : 0;
+  s.overclaim = s.orders ? s.claimed/s.orders - 1 : 0;
   return s;
+}
+// previous period; for "today so far" compare with yesterday up to the same hour
+function aggPrev(f, R) {
+  const a = agg(filterRows(f,1,R));
+  if (R !== 0) return a;
+  for (const k of ['spend','clicks','landed','pv','atc','co','orders','revenue','newOrders','claimed','claimedRev']) a[k] *= FRAC;
+  return derive(a);
+}
+// Shopify orders that did not come from an ad click, for a date range
+function otherAgg(R, period=0) {
+  let lo = period*R, hi = lo+R; if (R===0) { lo = period===0?-1:0; hi = lo+1; }
+  const o = {orders:0, revenue:0}; for (let d=lo; d<hi; d++) if (OTHER[d]) { o.orders += OTHER[d].orders; o.revenue += OTHER[d].revenue; }
+  if (R===0 && period===1) { o.orders *= FRAC; o.revenue *= FRAC; }
+  return o;
+}
+const plainFilters = f => f.campaign==='all' && f.device==='all' && f.lp==='all';
+const dayLabel = d => d===-1 ? 'Today' : d===0 ? 'Yesterday' : new Date(TODAY.getTime() - (d+1)*864e5).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+const timeNow = () => NOW.toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'});
+function srcLine() {
+  const s = [];
+  if (state.connected.shopify) s.push('Shopify orders'); if (state.connected.google) s.push('Google Ads'); if (state.connected.meta) s.push('Meta Ads'); if (state.connected.ga4) s.push('GA4');
+  return `<div class="src">Source: ${s.join(' · ')} · synced ${ago(state.syncedAt)}${state.connected.shopify?' · revenue = Shopify':''}</div>`;
 }
 function groupBy(rows, fn) {
   const m = {};
@@ -623,7 +685,7 @@ function viewReport() {
   const f = state.filters;
   if (f.channel!=='all' && !state.connected[f.channel]) f.channel='all';
   if (f.campaign!=='all' && !adChans().includes(CAMP[f.campaign].ch)) f.campaign='all';
-  const rows = filterRows(f), A = agg(rows), P = agg(filterRows(f,1));
+  const rows = filterRows(f), A = agg(rows), P = aggPrev(f, f.range);
 
   // filter bar
   const camps = CAMPAIGNS.filter(c => adChans().includes(c.ch) && (f.channel==='all'||c.ch===f.channel));
@@ -631,7 +693,7 @@ function viewReport() {
   const active = ['channel','campaign','device','lp'].filter(k=>f[k]!=='all').length;
   let h = `<p class="sub">What happens after someone clicks your ad — from the click, to the page, to the cart, to the order.</p>${missingBanner()}
   <div class="filters">
-    <label>Date range<select data-filter="range">${[7,14,30,90].map(r=>opt(r,RANGE_LABEL[r],f.range)).join('')}</select></label>
+    <label>Date range<select data-filter="range">${[0,1,7,14,30,90].map(r=>opt(r,RANGE_LABEL[r],f.range)).join('')}</select></label>
     <label>Channel<select data-filter="channel">${opt('all','All channels',f.channel)}${adChans().map(k=>opt(k,chName(k),f.channel)).join('')}</select></label>
     <label>Campaign<select data-filter="campaign">${opt('all','All campaigns',f.campaign)}${camps.map(c=>opt(c.id,c.name,f.campaign)).join('')}</select></label>
     <label>Device<select data-filter="device">${opt('all','All devices',f.device)}${opt('mobile','Mobile',f.device)}${opt('desktop','Desktop',f.device)}</select></label>
@@ -646,7 +708,7 @@ function viewReport() {
   // KPIs
   const K = [
     ['Ad spend', fmtINR(A.spend), delta(A.spend,P.spend,'neutral')],
-    ['Revenue', fmtINR(A.revenue), delta(A.revenue,P.revenue)],
+    [state.connected.shopify?'Revenue (Shopify)':'Revenue (ad platforms)', fmtINR(A.revenue), delta(A.revenue,P.revenue)],
     ['ROAS', x2(A.roas), delta(A.roas,P.roas)],
     ['Orders', fmtN(A.orders), delta(A.orders,P.orders)],
     ['Ad clicks', fmtN(A.clicks), delta(A.clicks,P.clicks,'neutral')],
@@ -669,6 +731,22 @@ function viewReport() {
   else if (campAgg[0]) ins.push(`<div class="card ins good"><div class="ic">★</div><div><b>Top campaign: ${esc(campAgg[0].key ? CAMP[campAgg[0].key].name : '')}</b><p>${x2(campAgg[0].roas)} ROAS on ${fmtINR(campAgg[0].spend)} spend.</p><button class="ask" data-ask="Which campaign should I scale?">What to scale →</button></div></div>`);
   h += `<div class="grid g3 mt">${ins.join('')}</div>`;
 
+  // ad platforms vs Shopify
+  const chG = groupBy(rows, r=>r.ch).sort((a,b)=>b.spend-a.spend);
+  const oth = f.channel==='all' && plainFilters(f) ? otherAgg(f.range) : null;
+  if (state.connected.shopify) {
+    const tot = agg(rows);
+    h += `<div class="card mt"><div class="card-h"><h3>Ad platforms vs Shopify</h3><span class="hint">What each platform claims vs orders Shopify actually recorded from its clicks</span></div><div class="tw"><table>
+      <thead><tr><th>Channel</th><th>Spend</th><th>Platform says</th><th>Shopify confirms</th><th>Overclaim</th><th>Platform ROAS</th><th>True ROAS</th></tr></thead><tbody>
+      ${chG.map(c=>`<tr><td><div class="cn"><span class="dot" style="background:${chColor(c.key)}"></span>${chName(c.key)}</div></td><td>${fmtINR(c.spend)}</td><td>${fmtN(c.claimed)} orders</td><td><b>${fmtN(c.orders)} orders</b></td><td class="${c.overclaim>.3?'neg':''}">+${pct(c.overclaim,0)}</td><td>${x2(c.platRoas)}</td><td class="${c.roas<CONFIG.breakevenRoas?'neg':'pos'}">${x2(c.roas)}</td></tr>`).join('')}
+      ${chG.length>1?`<tr><td><b>All ads</b></td><td>${fmtINR(tot.spend)}</td><td>${fmtN(tot.claimed)} orders</td><td><b>${fmtN(tot.orders)} orders</b></td><td>+${pct(tot.overclaim,0)}</td><td>${x2(tot.platRoas)}</td><td><b>${x2(tot.roas)}</b></td></tr>`:''}
+      </tbody></table></div>
+      ${oth?`<div class="card-b" style="border-top:1px solid var(--line2);font-size:13px;color:var(--ink2)"><b style="color:var(--ink)">Shopify total: ${fmtN(tot.orders+oth.orders)} orders · ${fmtINR(tot.revenue+oth.revenue)}.</b> Ad clicks drove ${pct(tot.orders/(tot.orders+oth.orders),0)} of orders; the other ${fmtN(oth.orders)} came from organic, direct, WhatsApp and email. Platforms together claim ${fmtN(tot.claimed)} — ${fmtN(tot.claimed-tot.orders)} more than Shopify can match to an ad click.</div>`:''}
+    </div>`;
+  } else {
+    h += `<div class="banner info mt"><span>🔍 Connect <b>Shopify</b> to see how many orders each ad platform overclaims versus what actually happened.</span><button class="btn sm" data-act="go" data-view="integrations">Connect Shopify</button></div>`;
+  }
+
   // funnel + trend
   const st = [['Ad clicks','',A.clicks],['Landed on site','page loaded',A.landed],['Viewed a product','',A.pv],['Added to cart','',A.atc],['Reached checkout','',A.co],['Purchased','orders',A.orders]];
   const fun = st.map((s,i) => {
@@ -680,7 +758,8 @@ function viewReport() {
       <div class="drop">${i?`<b>${pct(s[2]/prev,1)}</b> continue${isLeak?' <span class="tag bad">Biggest leak</span>':''}`:'<span class="tag neu">Start</span>'}</div></div>`;
   }).join('');
 
-  const days = groupBy(rows, r=>r.d).sort((a,b)=>b.key-a.key);
+  const trendRows = f.range < 7 ? filterRows(f,0,7) : rows;
+  const days = groupBy(trendRows, r=>r.d).sort((a,b)=>b.key-a.key);
   const labels = days.map(x=>fmtDate(ROWS.find(r=>r.d==x.key).t));
   let series, fmt;
   if (state.trend==='rev') { series=[{name:'Revenue',color:'#4f46e5',values:days.map(x=>x.revenue)},{name:'Ad spend',color:'#f59e0b',values:days.map(x=>x.spend),dash:1}]; fmt=v=>fmtINR(v); }
@@ -691,7 +770,7 @@ function viewReport() {
   h += `<div class="grid g2 mt">
     <div class="card"><div class="card-h"><h3>Post-click journey</h3><span class="hint">${RANGE_LABEL[f.range]}</span></div><div class="card-b">${fun}
       ${L?`<div class="note"><b>Why this leak usually happens:</b> ${L.why}</div>`:''}</div></div>
-    <div class="card"><div class="card-h"><h3>Trend</h3><div class="r"><div class="tabs">
+    <div class="card"><div class="card-h"><h3>Trend</h3>${f.range<7?'<span class="hint">Last 7 days</span>':''}<div class="r"><div class="tabs">
       <button class="${state.trend==='rev'?'on':''}" data-act="trend" data-t="rev">Revenue & spend</button>
       <button class="${state.trend==='roas'?'on':''}" data-act="trend" data-t="roas">ROAS</button>
       <button class="${state.trend==='cvr'?'on':''}" data-act="trend" data-t="cvr">Conversion</button></div></div></div>
@@ -779,47 +858,93 @@ function viewAsk() {
 }
 
 /* ---------- WhatsApp ---------- */
+const GROUP = {name:()=>CONFIG.storeName+' · Growth team', members:['You (Founder)','Riya — Marketing','Aman — Performance','Neha — Ops']};
+const FREQ = {
+  auto:   {label:'Auto — based on daily spend', desc:'Above ₹50k/day: 3 times a day. Below: morning + evening. Alerts any time.'},
+  three:  {label:'3 times a day', desc:'9:00 AM recap · 2:00 PM check · 8:00 PM day close', times:['9:00 AM','2:00 PM','8:00 PM']},
+  two:    {label:'Morning + evening', desc:'9:00 AM recap · 8:00 PM day close', times:['9:00 AM','8:00 PM']},
+  evening:{label:'Evening only', desc:'8:00 PM day close', times:['8:00 PM']}
+};
+const avgDailySpend = () => agg(filterRows({range:7,channel:'all',campaign:'all',device:'all',lp:'all'},0,7)).spend/7;
+function scheduleTimes() { const k = state.wa.freq; if (k!=='auto') return FREQ[k].times; return avgDailySpend() > 50000 ? FREQ.three.times : FREQ.two.times; }
+let waLive = [], waBusy = false;
+const waFmt = s => esc(s).replace(/\*(.+?)\*/g,'<b>$1</b>');
 function waMessage() {
   const f = {range:1,channel:'all',campaign:'all',device:'all',lp:'all'};
-  const A = agg(filterRows(f,0,1)), P = agg(filterRows(f,1,1));
-  const day = new Date(TODAY); day.setDate(day.getDate()-1);
-  const L = leakOf(A);
-  const camps = groupBy(filterRows(f,0,1), r=>r.c).filter(c=>c.spend>A.spend*.05).sort((a,b)=>b.roas-a.roas);
-  const lps = groupBy(filterRows(f,0,1), r=>r.lp).filter(x=>x.clicks>A.clicks*.05).sort((a,b)=>a.landRate-b.landRate);
+  const rows = filterRows(f,0,1), A = agg(rows), P = agg(filterRows(f,1,1)), oth = otherAgg(1);
+  const L = leakOf(A), ch = groupBy(rows, r=>r.ch).sort((a,b)=>b.spend-a.spend);
+  const lps = groupBy(rows, r=>r.lp).filter(x=>x.clicks>A.clicks*.05).sort((a,b)=>a.landRate-b.landRate);
+  const shop = state.connected.shopify;
+  const gapCh = ch.slice().sort((a,b)=>b.overclaim-a.overclaim)[0];
   const arrow = (c,p) => c>=p ? '▲' : '▼';
-  return `*${CONFIG.storeName} · Daily post-click report*
-${day.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})}
+  return `*Good morning ☀️ Yesterday at ${CONFIG.storeName}*
 
-💰 Spend ${fmtINR(A.spend)} → Revenue ${fmtINR(A.revenue)}
-📈 ROAS *${x2(A.roas)}* ${arrow(A.roas,P.roas)} ${Math.abs((A.roas-P.roas)/P.roas*100).toFixed(0)}%
-🛒 ${fmtN(A.orders)} orders · CVR ${pct(A.cvr,2)}
+💰 Total ad spend: *${fmtINR(A.spend)}* (${ch.map(c=>`${c.key==='google'?'Google':'Meta'} ${fmtINR(c.spend)}`).join(' · ')})
+🛍️ ${shop?'Shopify sales':'Sales from ads'}: *${fmtINR(shop?A.revenue+oth.revenue:A.revenue)}* · ${fmtN(shop?A.orders+oth.orders:A.orders)} orders
+📈 True ROAS: *${x2(A.roas)}* ${arrow(A.roas,P.roas)} ${Math.abs((A.roas-P.roas)/P.roas*100).toFixed(0)}%
+${ch.map(c=>`• ${chName(c.key)}: ${fmtN(c.orders)} orders · ${x2(c.roas)}`).join('\n')}
+${shop&&gapCh?`\n🔍 ${chName(gapCh.key)} claims ${fmtN(gapCh.claimed)} orders, Shopify confirms ${fmtN(gapCh.orders)} (+${pct(gapCh.overclaim,0)})`:''}
+⚠️ ${L?cap(L.bad(L.rate)):''}${lps[0]?` — worst: ${LPS[lps[0].key].name} (${LPS[lps[0].key].load}s load)`:''}
 
-⚠️ *Biggest leak:* ${L?cap(L.bad(L.rate)):'-'}
-${lps[0]?`📄 ${LPS[lps[0].key].name} lost ${pct(1-lps[0].landRate,0)} of clicks (${LPS[lps[0].key].load}s load)`:''}
-✅ *Best:* ${camps[0]?CAMP[camps[0].key].name+' — '+x2(camps[0].roas):'-'}
-
-Reply *1* campaigns · *2* landing pages · or just ask a question`;
+Ask me anything in this group 👇`;
+}
+function waAfternoon() {
+  const A = agg(filterRows({range:0,channel:'all',campaign:'all',device:'all',lp:'all'},0,0));
+  return `*2 PM check*\nSpend so far ₹${fmtN(A.spend/FRAC*0.58)} · ${fmtN(A.orders/FRAC*0.55)} orders. On track vs a normal day. Nothing else to flag.`;
 }
 function viewWhatsApp() {
   if (!adChans().length) return needConnect();
-  const tg = (k,b,s) => `<div class="set-row"><div><b>${b}</b><span>${s}</span></div><button class="tog ${state.wa[k]?'on':''}" data-act="waTog" data-k="${k}" aria-label="${b}"></button></div>`;
-  const camps = groupBy(filterRows({range:1,channel:'all',campaign:'all',device:'all',lp:'all'},0,1), r=>r.c).sort((a,b)=>b.revenue-a.revenue).slice(0,4);
-  return `<p class="sub">Your report, delivered on WhatsApp every morning. No dashboard login needed — reply to ask follow-up questions.</p>
+  const w = state.wa, times = scheduleTimes(), avg = avgDailySpend();
+  const learn = alertsFor('learn'), fixed = alertsFor('fixed'), cur = w.mode==='learn' ? learn : fixed;
+  const ydayAlerts = cur.filter(a=>a.d===0);
+  const radio = (k, o) => `<label class="opt ${w.freq===k?'on':''}" data-act="waFreq" data-k="${k}"><input type="radio" ${w.freq===k?'checked':''}><div><b>${o.label}</b><span>${o.desc}</span></div></label>`;
+  const msgs = [];
+  msgs.push(`<div class="wa-day">Today</div>`);
+  msgs.push(`<div class="wa-sys">${CONFIG.appName} bot was added by You · ${GROUP.members.length} members</div>`);
+  if (times.includes('9:00 AM')) msgs.push(`<div class="wa"><span class="who" style="color:#7c3aed">${CONFIG.appName}</span>${waFmt(waMessage())}<span class="tm">9:00 AM</span></div>`);
+  if (ydayAlerts[0]) msgs.push(`<div class="wa"><span class="who" style="color:#7c3aed">${CONFIG.appName}</span><b>🚨 Alert</b>\n${esc(ydayAlerts[0].text)}${ydayAlerts.length>1?`\n+${ydayAlerts.length-1} more — ask “anything wrong?”`:''}<span class="tm">11:42 AM</span></div>`);
+  if (state.connected.shopify) {
+    const g = groupBy(filterRows({range:1,channel:'all',campaign:'all',device:'all',lp:'all'},0,1), r=>r.ch).find(c=>c.key==='meta');
+    if (g) { msgs.push(`<div class="wa me"><span class="who" style="color:#c2410c">Riya — Marketing</span>@${CONFIG.appName} Meta says how many orders yesterday vs Shopify?<span class="tm">12:10 PM</span></div>`);
+      msgs.push(`<div class="wa"><span class="who" style="color:#7c3aed">${CONFIG.appName}</span>Meta reported <b>${fmtN(g.claimed)}</b> orders yesterday. Shopify matched <b>${fmtN(g.orders)}</b> to Meta clicks (+${pct(g.overclaim,0)} overclaim).\nTrue ROAS ${x2(g.roas)} vs ${x2(g.platRoas)} in Meta Ads Manager.<div class="src">Source: Shopify orders · Meta Ads</div><span class="tm">12:10 PM</span></div>`); }
+  }
+  if (times.includes('2:00 PM')) msgs.push(`<div class="wa"><span class="who" style="color:#7c3aed">${CONFIG.appName}</span>${waFmt(waAfternoon())}<span class="tm">2:00 PM</span></div>`);
+  for (const m of waLive) msgs.push(m.me ? `<div class="wa me"><span class="who" style="color:#047857">You</span>${esc(m.text)}<span class="tm">${m.t} ✓✓</span></div>` : `<div class="wa"><span class="who" style="color:#7c3aed">${CONFIG.appName}</span>${m.html}<span class="tm">${m.t}</span></div>`);
+  if (waBusy) msgs.push(`<div class="wa"><span class="typing"><i></i><i></i><i></i></span></div>`);
+  return `<p class="sub">The bot lives inside your team’s WhatsApp group. It posts on a schedule, flags problems as they happen, and anyone in the group can ask it a question.</p>
   <div class="grid g2">
-    <div class="card"><div class="card-h"><h3>Delivery</h3></div><div class="card-b">
-      <div class="set-row"><div><b>Send to</b><span>${CONFIG.whatsappNumber}</span></div><button class="btn sm" data-act="waEdit">Change</button></div>
-      ${tg('daily','Daily report — 9:00 AM','Yesterday’s spend, ROAS, orders and the biggest leak')}
-      ${tg('weekly','Weekly summary — Monday 9:00 AM','Week-over-week by channel, campaign and landing page')}
-      ${tg('alerts','Instant alerts','When ROAS drops 20%+ or a landing page stops loading')}
-      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" data-act="waTest">Send test message</button><button class="btn" data-act="openChat">Preview replies in Ask AI</button></div>
-    </div></div>
-    <div><div class="phone"><div class="ph"><div class="ai-av" style="width:34px;height:34px;border-radius:50%">${CONFIG.appName[0]}</div><div><b>${CONFIG.appName}</b><span>Business account</span></div></div>
-      <div class="pb"><div class="wa">${esc(waMessage()).replace(/\*(.+?)\*/g,'<b>$1</b>')}<span class="tm">9:00 AM</span></div>
-      <div class="wa me">1<span class="tm">9:04 AM ✓✓</span></div>
-      <div class="wa"><b>Top campaigns yesterday</b>
-${camps.map(c=>`• ${esc(CAMP[c.key].name.split(' — ').pop())}: ${x2(c.roas)} · ${fmtN(c.orders)} orders`).join('\n')}<span class="tm">9:04 AM</span></div></div></div></div>
+    <div class="grid" style="align-content:start">
+      <div class="card"><div class="card-h"><h3>Group</h3><span class="hint">${GROUP.members.length} members</span></div><div class="card-b">
+        <div class="set-row"><div><b>${esc(GROUP.name())}</b><span>${GROUP.members.join(' · ')}</span></div><button class="btn sm" data-act="waInvite">Invite link</button></div>
+        <div class="set-row"><div><b>Weekly summary — Monday 9:00 AM</b><span>Week-over-week by channel, campaign and landing page</span></div><button class="tog ${w.weekly?'on':''}" data-act="waTog" data-k="weekly" aria-label="Weekly summary"></button></div>
+      </div></div>
+      <div class="card"><div class="card-h"><h3>How often it posts</h3><span class="hint">Your spend: ~${fmtINR(avg)}/day</span></div><div class="card-b">
+        ${Object.entries(FREQ).map(([k,o])=>radio(k,o)).join('')}
+        <div class="note">Posting at <b>${times.join(' · ')}</b>${w.freq==='auto'?` (your spend is ${avg>50000?'above':'below'} ₹50k/day)`:''}. Between posts it stays quiet unless an alert fires.</div>
+      </div></div>
+      <div class="card"><div class="card-h"><h3>When to raise an alert</h3></div><div class="card-b">
+        <label class="opt ${w.mode==='learn'?'on':''}" data-act="waMode" data-k="learn"><input type="radio" ${w.mode==='learn'?'checked':''}><div><b>Learn this brand’s normal (recommended)</b><span>Alerts only when a number breaks from its own range over the last 4 weeks. Fewer false alarms.</span></div></label>
+        <label class="opt ${w.mode==='fixed'?'on':''}" data-act="waMode" data-k="fixed"><input type="radio" ${w.mode==='fixed'?'checked':''}><div><b>Fixed rules</b><span>Alert when a number crosses a limit you set.</span></div></label>
+        ${w.mode==='fixed'?`<div class="ths"><label>Campaign ROAS below<input type="number" step="0.1" data-th="roas" value="${w.th.roas}"></label><label>Spend jump above (%)<input type="number" data-th="spend" value="${w.th.spend}"></label><label>Platform vs Shopify gap (%)<input type="number" data-th="gap" value="${w.th.gap}"></label></div>`:''}
+        <div style="display:flex;gap:16px;align-items:flex-end;margin-top:6px"><div><div class="bigcount">${cur.length}</div><div style="font-size:12.5px;color:var(--ink2)">alerts in the last 7 days</div></div>
+        <div style="font-size:12.5px;color:var(--ink2)">${w.mode==='learn'?`Fixed rules would have sent <b>${fixed.length}</b>.`:`Learning mode would have sent <b>${learn.length}</b>.`}</div></div>
+        <ul class="alist">${cur.slice(0,6).map(a=>`<li><span class="when">${dayLabel(a.d)}</span><span>${esc(a.text)}</span></li>`).join('')}${cur.length>6?`<li><span class="when"></span><span style="color:var(--ink3)">+${cur.length-6} more</span></li>`:''}</ul>
+      </div></div>
+    </div>
+    <div><div class="phone"><div class="ph"><div class="ai-av" style="width:34px;height:34px;border-radius:50%;background:#128c7e">👥</div><div><b>${esc(GROUP.name())}</b><span>${GROUP.members.map(m=>m.split(' ')[0]).join(', ')}, ${CONFIG.appName}</span></div></div>
+      <div class="pb" id="waBody">${msgs.join('')}</div>
+      <form class="wa-in" id="waForm" autocomplete="off"><input id="waIn" placeholder="Ask the bot… e.g. aaj ka spend?"><button type="submit" aria-label="Send">➤</button></form></div>
+      <div style="text-align:center;font-size:12px;color:var(--ink3);margin-top:10px">Type a question to try it live — same answers as Ask AI</div></div>
   </div>`;
 }
+function waAsk(q) {
+  q = q.trim(); if (!q || waBusy) return;
+  const t = new Date().toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'});
+  waLive.push({me:true, text:q, t}); waBusy = true; render(); scrollWa();
+  setTimeout(()=>{ let html; try { html = answer(q); } catch(e) { html = 'Sorry, I couldn’t read that. Try asking another way.'; }
+    waLive.push({html: html + srcLine(), t}); waBusy = false; render(); scrollWa(); }, 900);
+}
+function scrollWa() { const b = $('waBody'); if (b) b.scrollTop = b.scrollHeight; }
 
 /* ---------- Settings ---------- */
 function viewSettings() {
@@ -896,12 +1021,12 @@ function runSync() {
 /* =========================================================
    CHATBOT — answers computed from the same data as the report
    ========================================================= */
-const SUGGEST = ['Where am I losing customers after the click?','Which campaign should I scale?','Which campaign is wasting money?','Google vs Meta — which is better?','Why is my Meta ROAS dropping?','How is mobile checkout doing?','Which landing page is hurting me?','Summary of yesterday','What should I fix first?'];
+const SUGGEST = ['What’s today’s spend and sales across all channels?','Which channel is overclaiming vs Shopify?','What happened after people clicked?','Is anything wrong right now?','How do we compare with similar brands?','Where am I losing customers after the click?','Which campaign should I scale?','Which campaign is wasting money?','Google vs Meta — which is better?','Why is my Meta ROAS dropping?','How is mobile checkout doing?','Which landing page is hurting me?','Summary of yesterday','What should I fix first?'];
 
 function ctx(R) {
-  const f = {...state.filters}; R = R || f.range;
+  const f = {...state.filters}; if (R === undefined) R = f.range;
   const rows = filterRows(f,0,R), prev = filterRows(f,1,R);
-  return {f, R, rows, prev, A:agg(rows), P:agg(prev), label:RANGE_LABEL[R]||`Last ${R} days`, scope:scopeLabel(f)};
+  return {f, R, rows, prev, A:agg(rows), P:aggPrev(f,R), label:RANGE_LABEL[R]||`Last ${R} days`, scope:scopeLabel(f)};
 }
 const has = (t, arr) => arr.some(w => t.includes(w));
 const tbl = (head, rows) => `<div class="tw"><table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
@@ -913,6 +1038,10 @@ function answer(q) {
   if (!adChans().length) return `<p>I don’t have any data yet. Connect Google Ads or Meta Ads in <b>Integrations</b> and I’ll answer from your real post-click numbers.</p>`;
   if (/^(hi|hello|hey|namaste|hii+|yo)\b/.test(t) && t.length < 25) return `<p>Hi! I’ve read your post-click data for <b>${ctx().label.toLowerCase()}</b>. Ask me where shoppers drop off, which campaigns to scale or cut, or anything else.</p>`;
   if (has(t,['what can you','help me','how do you work','kya kar'])) return `<p>I answer questions using your connected Google Ads, Meta Ads, Shopify and GA4 data — the same numbers as the report. For example:</p><ul>${SUGGEST.slice(0,5).map(s=>`<li>${s}</li>`).join('')}</ul><p>I follow the filters you’ve set on the report.</p>`;
+  if (has(t,['overclaim','over-claim','claim','says','attribution','attributed','mismatch','lying','shopify vs','vs shopify','true roas','real roas','reported','actual orders','gap'])) return ansGap();
+  if (has(t,['today','aaj','so far','right now spend','spent today'])) { if (has(t,['wrong','issue','problem','alert'])) return ansIssues(); return ansToday(); }
+  if (has(t,['anything wrong','something wrong','gadbad','red flag','any alert','alerts','everything ok','all good'])) return ansIssues();
+  if (has(t,['similar brand','other brand','industry','benchmark','peers','competitor','compare with','compare us','compare me','how do we compare'])) return ansPeers();
   if (has(t,['meta','facebook','instagram',' fb','reels']) && has(t,['drop','down','fall','why','kyu','kyun','declin','worse','low','bad'])) return ansMetaDrop();
   if ((has(t,['vs','versus','compare','comparison','better']) && has(t,['google','meta','facebook','channel'])) || has(t,['which channel','channels'])) return ansCompare();
   if (has(t,['mobile','desktop','device','phone','laptop'])) return ansDevice();
@@ -924,9 +1053,10 @@ function answer(q) {
   if (has(t,['new customer','returning','repeat','new vs','first-time','first time'])) return ansNewRet();
   if (has(t,['cost per','cpa','cac','cpo','acquisition cost'])) return ansCpo();
   if (has(t,['revenue','sales','roas','orders']) && has(t,['drop','down','why','fell','increase','up','change','trend'])) return ansTrend();
-  if (has(t,['losing','leak','drop','funnel','journey','after the click','after click','post-click','post click','kahan','kaha','where do'])) return ansLeak();
+  if (has(t,['losing','leak','drop','funnel','journey','after the click','after click','clicked','post-click','post click','kahan','kaha','where do'])) return ansLeak();
   if (has(t,['should i','recommend','suggest','what to do','fix first','next step','action','advice','karu','karna','priorit'])) return ansRecs();
   if (has(t,['spend','budget','spent'])) return ansSpend();
+  if (has(t,['issue','problem','wrong','alert'])) return ansIssues();
   if (has(t,['yesterday','kal '])) return ansSummary(1);
   if (has(t,['week'])) return ansSummary(7);
   if (has(t,['month'])) return ansSummary(30);
@@ -1044,7 +1174,7 @@ function ansCpo() {
 }
 function ansSpend() {
   const x = ctx(), ch = groupBy(x.rows, r=>r.ch);
-  return `<p>You spent <b>${fmtINR(x.A.spend)}</b> in ${x.label.toLowerCase()} (${fmtINR(x.A.spend/x.R)}/day), ${chgWord(x.A.spend,x.P.spend)} vs the period before.</p>
+  return `<p>You spent <b>${fmtINR(x.A.spend)}</b> in ${x.label.toLowerCase()} (${fmtINR(x.A.spend/Math.max(1,x.R))}/day), ${chgWord(x.A.spend,x.P.spend)} vs the period before.</p>
     ${tbl(['Channel','Spend','Share','ROAS'], ch.map(c=>[chName(c.key), fmtINR(c.spend), pct(c.spend/x.A.spend,0), x2(c.roas)]))}`;
 }
 function ansTrend() {
@@ -1070,6 +1200,72 @@ function ansRecs() {
   return `<p>Here’s what I’d do first, in order of impact for ${x.label.toLowerCase()}:</p><ol>${items.slice(0,4).map(i=>`<li>${i}</li>`).join('')}</ol>`;
 }
 
+function ansToday() {
+  const x = ctx(0), A = x.A, P = x.P;
+  if (!A.clicks) return `<p>No ad activity yet today with the current filters.</p>`;
+  const ch = groupBy(x.rows, r=>r.ch).sort((a,b)=>b.spend-a.spend);
+  const oth = x.f.channel==='all' && plainFilters(x.f) ? otherAgg(0) : null;
+  const shop = state.connected.shopify;
+  return `<p><b>Today so far</b> (till ${timeNow()}) · ${x.scope}</p><ul>
+    <li>Total ad spend across channels: <b>${fmtINR(A.spend)}</b> (${chgWord(A.spend,P.spend)} vs this time yesterday).</li>
+    ${shop&&oth?`<li>Shopify sales: <b>${fmtINR(A.revenue+oth.revenue)}</b> from ${fmtN(A.orders+oth.orders)} orders — ${fmtN(A.orders)} of them came from ad clicks (${fmtINR(A.revenue)}).</li>`:`<li>Sales from ad clicks: <b>${fmtINR(A.revenue)}</b> from ${fmtN(A.orders)} orders.</li>`}
+    <li>ROAS on ${shop?'Shopify':'platform'} numbers: <b>${x2(A.roas)}</b> (${chgWord(A.roas,P.roas)}).</li></ul>
+    ${tbl(['Channel','Spend','Orders','Sales','ROAS'], ch.map(c=>[chName(c.key), fmtINR(c.spend), fmtN(c.orders), fmtINR(c.revenue), x2(c.roas)]))}`;
+}
+function ansGap() {
+  if (!state.connected.shopify) return `<p>To check what each platform overclaims I need Shopify, which is the source of truth for orders. Connect it in <b>Integrations</b>.</p>`;
+  const x = ctx(), ch = groupBy(x.rows, r=>r.ch).sort((a,b)=>b.overclaim-a.overclaim), w = ch[0];
+  if (!w) return `<p>No ad data with the current filters.</p>`;
+  return `<p>${x.label} · what each platform says vs what Shopify recorded from its clicks:</p>
+    ${tbl(['Channel','Platform says','Shopify','Overclaim','Platform ROAS','True ROAS'], ch.map(c=>[chName(c.key), fmtN(c.claimed), `<b>${fmtN(c.orders)}</b>`, `<span class="${c.overclaim>.3?'neg':''}">+${pct(c.overclaim,0)}</span>`, x2(c.platRoas), `<b>${x2(c.roas)}</b>`]))}
+    <p><b>${chName(w.key)}</b> overclaims the most: it reports ${fmtN(w.claimed)} orders, but Shopify can match only ${fmtN(w.orders)} to its clicks. The extra usually comes from view-through and 7-day attribution — people who saw an ad, then bought later through Google search, WhatsApp or by typing your URL.</p>
+    <p>After the click on ${chName(w.key)}: ${pct(w.landRate,0)} loaded the site, ${pct(w.pvRate,0)} of those opened a product, ${pct(w.atcOfLanded,1)} added to cart and ${pct(w.cvr,2)} bought.</p>
+    <div class="act">💡 Judge budgets on <b>true ROAS</b>. ${chName(w.key)} looks like ${x2(w.platRoas)} inside its own dashboard, but it’s ${x2(w.roas)} on Shopify numbers.</div>`;
+}
+function ansPeers() {
+  const x = ctx(), A = x.A, B = BENCH_PEERS;
+  const row = (l, you, peer, fmt, higherBetter=true) => { const good = higherBetter ? you >= peer : you <= peer; return [l, `<b>${fmt(you)}</b>`, fmt(peer), `<span class="tag ${good?'good':'bad'}">${good?'Better':'Worse'}</span>`]; };
+  return `<p>${x.label} vs a peer group of fashion D2C brands doing ₹5–20 L a month (anonymised):</p>
+    ${tbl(['Metric','You','Peers',''], [row('ROAS (Shopify)',A.roas,B.roas,x2), row('Clicks that load the site',A.landRate,B.landRate,v=>pct(v,0)), row('Conversion rate',A.cvr,B.cvr,v=>pct(v,2)), row('Cart → checkout',A.coRate,B.coRate,v=>pct(v,0)), row('Checkout → paid',A.purRate,B.purRate,v=>pct(v,0)), row('Average order',A.aov,B.aov,fmtINR), row('Cost per order',A.cpo,B.cpo,fmtINR,false)])}
+    <p>You’re ahead on ROAS and order value, but behind on how many clicks actually load your site — that’s where similar brands are beating you.</p>`;
+}
+// Alert engine — mode 'fixed' uses thresholds, 'learn' compares each number with the brand's own last 4 weeks
+function stats(a) { const m = a.reduce((x,y)=>x+y,0)/a.length; const sd = Math.sqrt(a.reduce((x,y)=>x+(y-m)**2,0)/a.length); return {m, sd}; }
+function alertsFor(mode, days=7) {
+  const th = state.wa.th, out = [], ch = adChans();
+  const dayAgg = (d, pred) => agg((BYDAY[d]||[]).filter(r => ch.includes(r.ch) && pred(r)));
+  for (let d = 0; d < days; d++) {
+    const all = dayAgg(d, ()=>true);
+    for (const c of CAMPAIGNS) {
+      if (!ch.includes(c.ch)) continue;
+      const a = dayAgg(d, r=>r.c===c.id); if (a.spend < all.spend*.05) continue;
+      if (mode==='fixed') { if (a.roas < th.roas) out.push({d, text:`${short(c.name)}: ROAS ${x2(a.roas)}, below your ${x2(th.roas)} limit`}); }
+      else { const h=[]; for (let k=d+7;k<d+35;k++) h.push(dayAgg(k, r=>r.c===c.id).roas); const {m,sd} = stats(h); if (a.roas < m-2*sd) out.push({d, text:`${short(c.name)}: ROAS ${x2(a.roas)} vs its usual ${x2(m)}`}); }
+    }
+    const hs = []; for (let k=d+1;k<d+29;k++) hs.push(dayAgg(k, ()=>true).spend);
+    const avg7 = hs.slice(0,7).reduce((x,y)=>x+y,0)/7, st = stats(hs);
+    if (mode==='fixed' ? all.spend > avg7*(1+th.spend/100) : all.spend > st.m+2.5*st.sd) out.push({d, text:`Total spend ${fmtINR(all.spend)} — well above the usual ${fmtINR(mode==='fixed'?avg7:st.m)}/day`});
+    if (state.connected.shopify) for (const k of ch) {
+      const a = dayAgg(d, r=>r.ch===k);
+      if (mode==='fixed') { if (a.overclaim > th.gap/100) out.push({d, text:`${chName(k)} claims ${pct(a.overclaim,0)} more orders than Shopify`}); }
+      else { const h=[]; for (let j=d+7;j<d+35;j++) h.push(dayAgg(j, r=>r.ch===k).overclaim); const {m,sd} = stats(h); if (a.overclaim > m+2*sd) out.push({d, text:`${chName(k)} overclaim jumped to ${pct(a.overclaim,0)} (usual ${pct(m,0)})`}); }
+    }
+    for (const lp of Object.keys(LPS)) {
+      const a = dayAgg(d, r=>r.lp===lp); if (a.clicks < all.clicks*.05) continue;
+      if (mode==='fixed') { if (a.landRate < .6) out.push({d, text:`${LPS[lp].name}: only ${pct(a.landRate,0)} of clicks loaded the page`}); }
+      else { const h=[]; for (let j=d+7;j<d+35;j++) h.push(dayAgg(j, r=>r.lp===lp).landRate); const {m,sd} = stats(h); if (a.landRate < m-2.5*sd) out.push({d, text:`${LPS[lp].name}: ${pct(a.landRate,0)} of clicks loaded (usual ${pct(m,0)})`}); }
+    }
+  }
+  return out;
+}
+function ansIssues() {
+  const mode = state.wa.mode, al = alertsFor(mode, 1);
+  const label = mode==='learn' ? 'compared with your own last 4 weeks' : 'using your fixed alert rules';
+  if (!al.length) return `<p>✅ Nothing unusual in the last 24 hours (${label}). Spend, ROAS, landing pages and the Meta/Google vs Shopify gap are all within their normal range.</p>`;
+  return `<p>${al.length} thing${al.length>1?'s':''} flagged in the last 24 hours (${label}):</p><ul>${al.map(a=>`<li>${esc(a.text)}</li>`).join('')}</ul>
+    <p style="color:var(--ink2)">Ask “Why is my Meta ROAS dropping?” or “Which landing page is hurting me?” for the detail.</p>`;
+}
+
 /* chat UI */
 let busy = false;
 function renderChatMeta() {
@@ -1092,6 +1288,7 @@ function ask(q) {
   state.chat.push({role:'me', text:q}); busy = true; renderChat();
   setTimeout(() => {
     let html; try { html = answer(q); } catch(e) { console.error(e); html = '<p>Something went wrong reading that data. Try asking another way.</p>'; }
+    html += srcLine();
     state.chat.push({role:'bot', html}); busy = false; renderChat(); save();
   }, 650 + Math.random()*700);
 }
@@ -1134,8 +1331,9 @@ document.addEventListener('click', e => {
     case 'closeChat': closeChat(); break;
     case 'expandChat': $('drawer').classList.remove('on'); state.view='ask'; render(); renderChat(); break;
     case 'waTog': state.wa[a.dataset.k] = !state.wa[a.dataset.k]; render(); break;
-    case 'waTest': a.disabled = true; a.innerHTML = '<span class="spin s"></span> Sending…'; setTimeout(()=>{ render(); toast('Test report sent to '+CONFIG.whatsappNumber); }, 1400); break;
-    case 'waEdit': toast('Number changes need OTP verification on WhatsApp'); break;
+    case 'waFreq': e.preventDefault(); state.wa.freq = a.dataset.k; render(); break;
+    case 'waMode': e.preventDefault(); state.wa.mode = a.dataset.k; render(); break;
+    case 'waInvite': toast('Invite link copied — add the bot to any WhatsApp group'); break;
     case 'saveSettings': {
       const n = $('setName').value.trim(); const be = parseFloat($('setBe').value);
       if (n) { CONFIG.storeName = n; state.storeName = n; }
@@ -1146,7 +1344,9 @@ document.addEventListener('click', e => {
       state = DEFAULT_STATE(); CONFIG.storeName = 'Kesar Lane'; $('drawer').classList.remove('on'); render(); toast('Workspace reset'); break;
   }
 });
+document.addEventListener('submit', e => { if (e.target.id==='waForm') { e.preventDefault(); const v = $('waIn').value; $('waIn').value=''; waAsk(v); } });
 document.addEventListener('change', e => {
+  const th = e.target.closest('[data-th]'); if (th) { const v = parseFloat(th.value); if (v>0) { state.wa.th[th.dataset.th] = v; render(); } return; }
   const s = e.target.closest('[data-filter]'); if (!s) return;
   const k = s.dataset.filter; state.filters[k] = k==='range' ? +s.value : s.value;
   if (k==='channel') state.filters.campaign = 'all';
