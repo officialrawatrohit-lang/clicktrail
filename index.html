@@ -1,0 +1,1165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ClickTrail — Post-click reports</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M8 21l5-6 4 4 7-9' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f6f8; --panel:#fff; --ink:#0f172a; --ink2:#475569; --ink3:#94a3b8; --line:#e6e8ec; --line2:#f0f1f4;
+  --brand:#4f46e5; --brand2:#4338ca; --brand-soft:#eef2ff;
+  --good:#047857; --good-soft:#ecfdf5; --bad:#b91c1c; --bad-soft:#fef2f2; --warn:#b45309; --warn-soft:#fffbeb;
+  --google:#1a73e8; --meta:#0866ff; --shopify:#5e8e3e; --ga4:#e37400; --wa:#25d366; --wa-dark:#075e54;
+  --r:12px; --shadow:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+html,body{overflow-x:hidden}
+.grid>*{min-width:0}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--brand)}
+.app{display:grid;grid-template-columns:236px 1fr;min-height:100vh}
+
+/* sidebar */
+.side{background:#0f172a;color:#cbd5e1;padding:18px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px;z-index:30}
+.logo{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:16px;padding:4px 8px 14px}
+.logo i{width:30px;height:30px;border-radius:8px;background:var(--brand);display:grid;place-items:center}
+.ws{background:#1e293b;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:13px}
+.ws b{color:#fff;display:block}.ws span{color:#94a3b8;font-size:12px}
+.nav{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:#cbd5e1;border:0;background:none;text-align:left;width:100%}
+.nav:hover{background:#1e293b;color:#fff}
+.nav.on{background:#312e81;color:#fff}
+.nav svg{width:18px;height:18px;flex:none;opacity:.9}
+.nav .pill{margin-left:auto;font-size:11px;background:#4f46e5;color:#fff;padding:1px 7px;border-radius:99px}
+.side .foot{margin-top:auto;font-size:12px;color:#64748b;padding:8px}
+
+/* main */
+.main{min-width:0}
+.top{position:sticky;top:0;z-index:20;background:rgba(245,246,248,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 28px;display:flex;align-items:center;gap:12px}
+.top h1{font-size:18px;margin:0;font-weight:650}
+.top .sync{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--ink2);font-size:12.5px}
+.burger{display:none;border:0;background:none;padding:4px;cursor:pointer}
+.content{padding:22px 28px 90px;max-width:1320px}
+.sub{color:var(--ink2);margin:-2px 0 18px}
+
+.btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 14px;cursor:pointer;font-weight:550;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn:hover{background:#f8fafc}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{background:var(--brand2)}
+.btn.sm{padding:5px 10px;font-size:13px}
+.btn.ghost{border-color:transparent;background:none}
+.btn:disabled{opacity:.55;cursor:default}
+.icon-btn{border:1px solid var(--line);background:#fff;border-radius:8px;width:32px;height:32px;display:grid;place-items:center;cursor:pointer}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.card-h{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line2)}
+.card-h h3{margin:0;font-size:14.5px;font-weight:650}
+.card-h .hint{color:var(--ink3);font-size:12.5px}
+.card-h .r{margin-left:auto;display:flex;gap:6px;align-items:center}
+.card-b{padding:16px 18px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.mt{margin-top:16px}
+.lpgrid{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+
+/* filters */
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px}
+.filters label{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--ink3);font-weight:550;text-transform:uppercase;letter-spacing:.03em}
+.filters select{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 30px 7px 10px;font-size:13.5px;min-width:130px;max-width:240px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;cursor:pointer;text-transform:none;letter-spacing:0;color:var(--ink);font-weight:500}
+.filters .sp{flex:1}
+.chip-f{display:inline-flex;align-items:center;gap:6px;background:var(--brand-soft);color:var(--brand2);border-radius:99px;padding:4px 10px;font-size:12.5px;font-weight:550}
+
+/* kpi */
+.kpi{padding:14px 16px}
+.kpi .l{color:var(--ink2);font-size:12.5px;font-weight:550}
+.kpi .v{font-size:22px;font-weight:700;margin:4px 0 2px;letter-spacing:-.01em}
+.d{font-size:12px;font-weight:600}
+.d.good{color:var(--good)}.d.bad{color:var(--bad)}.d.neu{color:var(--ink2)}
+.d small{color:var(--ink3);font-weight:500}
+
+/* insights */
+.ins{padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.ins .ic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex:none;font-size:16px}
+.ins.bad .ic{background:var(--bad-soft);color:var(--bad)}
+.ins.warn .ic{background:var(--warn-soft);color:var(--warn)}
+.ins.good .ic{background:var(--good-soft);color:var(--good)}
+.ins b{display:block;font-size:13.5px;margin-bottom:2px}
+.ins p{margin:0;color:var(--ink2);font-size:12.5px}
+.ins .ask{margin-top:6px;font-size:12.5px;color:var(--brand);cursor:pointer;font-weight:600;background:none;border:0;padding:0}
+
+/* funnel */
+.fun-row{display:grid;grid-template-columns:150px 1fr 150px;gap:14px;align-items:center;padding:7px 0}
+.fun-row .nm{font-weight:550;font-size:13.5px}
+.fun-row .nm small{display:block;color:var(--ink3);font-weight:500;font-size:12px}
+.bar{height:30px;background:var(--line2);border-radius:7px;overflow:hidden;position:relative}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#6366f1,#818cf8);border-radius:7px;min-width:3px;transition:width .5s}
+.bar span{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-weight:650;font-size:13px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.bar span.dark{color:var(--ink);text-shadow:none}
+.fun-row.leak .bar i{background:linear-gradient(90deg,#ef4444,#f87171)}
+.drop{font-size:12.5px;color:var(--ink2);text-align:right}
+.drop b{color:var(--ink)}
+.tag{display:inline-block;font-size:11px;font-weight:650;padding:2px 7px;border-radius:99px;white-space:nowrap}
+.tag.bad{background:var(--bad-soft);color:var(--bad)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tag.good{background:var(--good-soft);color:var(--good)}
+.tag.neu{background:var(--line2);color:var(--ink2)}
+
+/* tables */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:right;font-weight:600;color:var(--ink2);font-size:12px;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;background:#fafbfc;user-select:none}
+th:first-child,td:first-child{text-align:left}
+th.s{cursor:pointer}th.s:hover{color:var(--ink)}
+td{padding:10px 12px;border-bottom:1px solid var(--line2);text-align:right;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:#fafbff}
+td .cn{display:flex;align-items:center;gap:8px;font-weight:550}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.neg{color:var(--bad);font-weight:600}.pos{color:var(--good);font-weight:600}
+
+/* chart */
+.tabs{display:inline-flex;background:var(--line2);border-radius:8px;padding:3px}
+.tabs button{border:0;background:none;padding:5px 10px;border-radius:6px;font-size:12.5px;font-weight:550;color:var(--ink2);cursor:pointer}
+.tabs button.on{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+.chart{position:relative}
+.chart svg{width:100%;height:auto;display:block}
+.chart .tip{position:absolute;pointer-events:none;background:#0f172a;color:#fff;font-size:12px;padding:7px 10px;border-radius:8px;opacity:0;transition:opacity .1s;white-space:nowrap;z-index:2}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--ink2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:3px;border-radius:2px;display:inline-block}
+
+/* device */
+.dev{padding:16px}
+.dev h4{margin:0 0 10px;font-size:14px;display:flex;align-items:center;gap:8px}
+.dev dl{display:grid;grid-template-columns:1fr auto;gap:6px 10px;margin:0;font-size:13px}
+.dev dt{color:var(--ink2)}.dev dd{margin:0;font-weight:600;text-align:right}
+
+/* integrations */
+.int{padding:18px;display:flex;flex-direction:column;gap:12px}
+.int .hd{display:flex;align-items:center;gap:12px}
+.lg{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;flex:none;letter-spacing:-.02em}
+.int .hd b{font-size:15px;display:block}
+.int .hd span{font-size:12.5px;color:var(--ink2)}
+.int p{margin:0;color:var(--ink2);font-size:13px}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600}
+.st.on{color:var(--good)}.st.off{color:var(--ink3)}
+.st .dot{background:currentColor}
+.int .acts{display:flex;gap:8px;margin-top:auto;align-items:center}
+.int .meta{font-size:12px;color:var(--ink3)}
+.banner{display:flex;gap:12px;align-items:center;padding:12px 16px;border-radius:10px;background:var(--warn-soft);border:1px solid #fde68a;color:#78350f;font-size:13px;margin-bottom:16px}
+.banner .btn{margin-left:auto}
+.banner.info{background:var(--brand-soft);border-color:#c7d2fe;color:#312e81}
+
+.empty{text-align:center;padding:60px 20px}
+.empty h2{margin:12px 0 6px;font-size:20px}
+.empty p{color:var(--ink2);max-width:440px;margin:0 auto 18px}
+
+/* modal */
+.ov{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
+.ov.on{display:flex}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden;animation:pop .18s ease-out}
+@keyframes pop{from{transform:scale(.97);opacity:0}to{transform:none;opacity:1}}
+.modal .mh{padding:18px 20px 0;display:flex;align-items:center;gap:12px}
+.modal .mh b{font-size:16px}
+.modal .mh .x{margin-left:auto}
+.modal .mb{padding:16px 20px}
+.modal .mf{padding:14px 20px;border-top:1px solid var(--line2);display:flex;gap:8px;justify-content:flex-end;background:#fafbfc}
+.perm{list-style:none;padding:0;margin:10px 0 0;display:flex;flex-direction:column;gap:8px}
+.perm li{display:flex;gap:10px;align-items:flex-start;font-size:13.5px}
+.perm li::before{content:"✓";color:var(--good);font-weight:700}
+.note{background:#f8fafc;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:12.5px;color:var(--ink2);margin-top:12px}
+.acc{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:12px;cursor:pointer;margin-bottom:8px}
+.acc:hover{border-color:#c7d2fe}
+.acc.on{border-color:var(--brand);background:var(--brand-soft)}
+.acc input{accent-color:var(--brand)}
+.acc b{display:block;font-size:13.5px}.acc span{font-size:12px;color:var(--ink2)}
+.field{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:550}
+.field input{border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-weight:400}
+.field input:focus,.chat-in input:focus{outline:2px solid #c7d2fe;border-color:var(--brand)}
+.spin{width:38px;height:38px;border:3px solid var(--line);border-top-color:var(--brand);border-radius:50%;animation:sp .8s linear infinite;margin:6px auto 14px}
+.spin.s{width:14px;height:14px;border-width:2px;margin:0;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+.prog{height:8px;background:var(--line2);border-radius:99px;overflow:hidden;margin:14px 0}
+.prog i{display:block;height:100%;background:var(--brand);width:0;transition:width .35s}
+.steps{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:13px}
+.steps li{display:flex;gap:9px;align-items:center;color:var(--ink3)}
+.steps li.done{color:var(--ink)}
+.steps li.done .ck{background:var(--good);border-color:var(--good);color:#fff}
+.steps li.now{color:var(--ink)}
+.ck{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:10px;flex:none}
+.okbig{width:56px;height:56px;border-radius:50%;background:var(--good-soft);color:var(--good);display:grid;place-items:center;font-size:26px;margin:4px auto 12px}
+.center{text-align:center}
+
+/* chat */
+.fab{position:fixed;right:22px;bottom:22px;z-index:40;background:var(--ink);color:#fff;border:0;border-radius:99px;padding:12px 18px;display:flex;gap:8px;align-items:center;font-weight:600;box-shadow:0 10px 30px rgba(15,23,42,.3);cursor:pointer}
+.fab:hover{background:#1e293b}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:440px;max-width:100%;background:#fff;border-left:1px solid var(--line);z-index:60;transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.08)}
+.drawer{visibility:hidden}
+.drawer.on{transform:none;visibility:visible}
+.drawer .dh{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.drawer .dh b{display:block}.drawer .dh span{font-size:12px;color:var(--ink2)}
+.drawer .dh .r{margin-left:auto;display:flex;gap:6px}
+.drawer .db{flex:1;min-height:0;display:flex}
+.ai-av{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#6366f1,#a855f7);display:grid;place-items:center;color:#fff;flex:none}
+.chat{display:flex;flex-direction:column;flex:1;min-height:0;width:100%}
+.chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.msg{display:flex;gap:10px;max-width:100%}
+.msg.me{justify-content:flex-end}
+.msg .bub{padding:10px 13px;border-radius:12px;font-size:13.5px;max-width:88%;overflow-wrap:anywhere}
+.msg.me .bub{background:var(--brand);color:#fff;border-bottom-right-radius:4px}
+.msg.bot .bub{background:#f4f5f8;border-bottom-left-radius:4px}
+.msg.bot .ai-av{width:26px;height:26px;border-radius:7px;font-size:12px}
+.bub p{margin:0 0 6px}.bub p:last-child{margin:0}
+.bub ul,.bub ol{margin:4px 0 6px;padding-left:18px}.bub li{margin:3px 0}
+.bub table{font-size:12px;background:#fff;border-radius:8px;overflow:hidden;margin:6px 0;border:1px solid var(--line)}
+.bub th,.bub td{padding:6px 8px}
+.bub .tw{margin:6px 0}
+.bub .act{margin-top:8px;padding:8px 10px;background:#fff;border:1px solid var(--line);border-left:3px solid var(--brand);border-radius:8px;font-size:12.5px}
+.typing{display:inline-flex;gap:4px;padding:4px 2px}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--ink3);animation:bl 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bl{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.chat-sugg{display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 10px}
+.chat-sugg button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 11px;font-size:12.5px;cursor:pointer;color:var(--ink2)}
+.chat-sugg button:hover{border-color:var(--brand);color:var(--brand)}
+.chat-in{display:flex;gap:8px;padding:12px 16px 16px;border-top:1px solid var(--line2)}
+.chat-in input{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+.chat-scope{font-size:11.5px;color:var(--ink3);padding:0 16px 6px}
+.ask-page{height:calc(100vh - 150px);min-height:480px;display:flex;overflow:hidden}
+.ask-hero{text-align:center;padding:18px 10px 4px}
+.ask-hero h2{margin:8px 0 4px;font-size:19px}
+.ask-hero p{margin:0;color:var(--ink2);font-size:13px}
+
+/* whatsapp */
+.phone{width:320px;max-width:100%;margin:0 auto;border-radius:34px;border:10px solid #111827;background:#efeae2;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.18)}
+.phone .ph{background:var(--wa-dark);color:#fff;padding:12px 14px;display:flex;gap:10px;align-items:center}
+.phone .ph b{display:block;font-size:14px}.phone .ph span{font-size:11.5px;opacity:.8}
+.phone .pb{padding:12px;min-height:430px;display:flex;flex-direction:column;gap:8px;background:#efeae2}
+.wa{background:#fff;border-radius:9px;padding:8px 10px;font-size:12.5px;max-width:92%;box-shadow:0 1px 1px rgba(0,0,0,.08);white-space:pre-wrap;line-height:1.4}
+.wa.me{background:#d9fdd3;align-self:flex-end}
+.wa .tm{display:block;text-align:right;font-size:10.5px;color:#667781;margin-top:3px}
+.set-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line2);gap:12px}
+.set-row:last-child{border-bottom:0}
+.set-row b{display:block;font-size:13.5px}.set-row span{font-size:12.5px;color:var(--ink2)}
+.tog{width:38px;height:22px;border-radius:99px;background:var(--line);position:relative;cursor:pointer;border:0;flex:none;transition:background .15s}
+.tog::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.tog.on{background:var(--good)}.tog.on::after{left:18px}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:#0f172a;color:#fff;padding:10px 16px;border-radius:10px;font-size:13.5px;opacity:0;transition:all .2s;z-index:200;pointer-events:none;max-width:90vw}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.scrim{display:none}
+
+@media (max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;left:0;top:0;width:250px;transform:translateX(-100%);transition:transform .2s}
+  .side.on{transform:none}
+  .scrim.on{display:block;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:25}
+  .burger{display:block}
+  .top{padding:10px 16px}
+  .top .sync .txt{display:none}
+  .content{padding:16px 16px 90px}
+  .g2,.lpgrid{grid-template-columns:1fr}
+  .fun-row{grid-template-columns:96px 1fr;gap:8px}
+  .fun-row .drop{grid-column:2;text-align:left;margin-top:-4px}
+  .filters select{min-width:0;max-width:none;width:100%}
+  .filters label{flex:1 1 140px}
+  .ask-page{height:calc(100vh - 130px)}
+}
+@media (max-width:520px){.g4{grid-template-columns:1fr 1fr}.kpi .v{font-size:18px}.fab span{display:none}.fab{padding:13px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side">
+    <div class="logo"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l5-6 4 4 7-9"/></svg></i><span id="appName">ClickTrail</span></div>
+    <div class="ws"><b id="wsName">Store</b><span id="wsDomain"></span></div>
+    <button class="nav" data-act="go" data-view="report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 6-6"/></svg>Post-click report</button>
+    <button class="nav" data-act="go" data-view="ask"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>Ask AI<span class="pill">New</span></button>
+    <button class="nav" data-act="go" data-view="whatsapp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 1-13.5 7.8L3 21l1.2-4.5A9 9 0 1 1 21 12z"/></svg>WhatsApp reports</button>
+    <button class="nav" data-act="go" data-view="integrations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 7V3M15 7V3M7 7h10v4a5 5 0 0 1-10 0z"/><path d="M12 16v5"/></svg>Integrations<span class="pill" id="intPill">0/4</span></button>
+    <button class="nav" data-act="go" data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button>
+    <div class="foot" id="footNote">Read-only access · Data refreshes hourly</div>
+  </aside>
+  <div class="scrim" id="scrim" data-act="closeSide"></div>
+  <main class="main">
+    <div class="top">
+      <button class="burger" data-act="openSide" aria-label="Menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <h1 id="title">Report</h1>
+      <div class="sync" id="sync"></div>
+    </div>
+    <div class="content" id="view"></div>
+  </main>
+</div>
+
+<button class="fab" id="fab" data-act="openChat"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/></svg><span>Ask AI about your report</span></button>
+
+<aside class="drawer" id="drawer">
+  <div class="dh">
+    <div class="ai-av"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/></svg></div>
+    <div><b>Report assistant</b><span>Answers from your connected data</span></div>
+    <div class="r">
+      <button class="icon-btn" title="Open full page" data-act="expandChat"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      <button class="icon-btn" title="Close" data-act="closeChat"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+  </div>
+  <div class="db" id="drawerBody"></div>
+</aside>
+
+<div class="ov" id="ov"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+<div id="chatHolder" hidden>
+  <div class="chat" id="chat">
+    <div class="chat-msgs" id="chatMsgs"></div>
+    <div class="chat-scope" id="chatScope"></div>
+    <div class="chat-sugg" id="chatSugg"></div>
+    <form class="chat-in" id="chatForm" autocomplete="off">
+      <input id="chatIn" placeholder="Ask anything about your post-click data…">
+      <button class="btn pri" type="submit">Send</button>
+    </form>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   CONFIG — change these to personalise the demo
+   ========================================================= */
+const CONFIG = {
+  appName: 'ClickTrail',
+  storeName: 'Kesar Lane',            // the demo brand shown in the dashboard
+  storeDomain: 'kesarlane.in',
+  shopifyHandle: 'kesar-lane',
+  whatsappNumber: '+91 98XXX X4321',
+  breakevenRoas: 2.0,                  // ROAS below this = losing money
+  seed: 20261030                       // change to get different (but stable) dummy numbers
+};
+
+/* =========================================================
+   DUMMY DATA — deterministic, generated in the browser
+   ========================================================= */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rnd = mulberry32(CONFIG.seed);
+
+const SOURCES = {
+  google:  {name:'Google Ads', short:'Ads', color:'#0f9d58', kind:'Ad platform', desc:'Campaign spend, clicks and the ads people clicked.',
+            perms:['View campaigns, ad groups and keywords','View spend, clicks and conversions','Read-only — we never edit your campaigns'],
+            sync:['Reading campaigns','Importing 90 days of clicks & spend','Matching ad clicks to site sessions']},
+  meta:    {name:'Meta Ads', short:'Meta', color:'#0866ff', kind:'Ad platform', desc:'Facebook & Instagram campaigns, ad sets and ads.',
+            perms:['View ad accounts, campaigns and ads','View spend, clicks and results','Read-only — we never edit your ads'],
+            sync:['Reading campaigns & ad sets','Importing 90 days of clicks & spend','Matching ad clicks to site sessions']},
+  shopify: {name:'Shopify', short:'Shop', color:'#5e8e3e', kind:'Store', desc:'Orders, revenue, products and customers.',
+            perms:['Read orders and order value','Read products and collections','Read customers (new vs returning)'],
+            sync:['Reading products & collections','Importing orders','Linking orders to ad clicks']},
+  ga4:     {name:'Google Analytics 4', short:'GA4', color:'#e37400', kind:'Analytics', desc:'Sessions, page views, add-to-cart and checkout events.',
+            perms:['Read GA4 property and data streams','Read sessions, events and page performance','Read-only access'],
+            sync:['Reading property & events','Importing sessions & page views','Building post-click funnels']}
+};
+const ACCOUNTS = {
+  google: [{id:'482-193-7710', name:()=>CONFIG.storeName+' — India', meta:'INR · 4 active campaigns'},
+           {id:'551-020-8834', name:()=>CONFIG.storeName+' — Old account', meta:'INR · no active campaigns'}],
+  meta:   [{id:'act_2849117730', name:()=>CONFIG.storeName+' Ads', meta:'INR · 4 active campaigns'},
+           {id:'act_1093384412', name:()=>CONFIG.storeName+' — Test', meta:'INR · inactive'}],
+  ga4:    [{id:'318447512', name:()=>CONFIG.storeName+' — Web', meta:()=>'Stream: www.'+CONFIG.storeDomain}]
+};
+
+const LPS = {
+  '/':                               {name:'Home page', load:2.1},
+  '/collections/kurtas':             {name:'Kurtas collection', load:2.8},
+  '/products/*':                     {name:'Product pages', load:2.4},
+  '/collections/dresses':            {name:'Dresses collection', load:2.5},
+  '/collections/festive-kurta-sets': {name:'Festive kurta sets', load:6.2},
+  '/cart':                           {name:'Cart (recovery)', load:1.9},
+  '/collections/co-ord-sets':        {name:'Co-ord sets collection', load:3.4}
+};
+
+// cvr = orders / landed sessions. Add-to-cart rate is derived so stages multiply to cvr.
+const CAMPAIGNS = [
+  {id:'g1',ch:'google',name:'Search — Brand',type:'Search',lp:'/',spend:900,cpc:5,land:.94,pv:.66,co:.5,pur:.6,cvr:.03,aov:1900,mob:.62,nw:.42},
+  {id:'g2',ch:'google',name:'Search — Kurtas (Generic)',type:'Search',lp:'/collections/kurtas',spend:1650,cpc:14,land:.88,pv:.6,co:.45,pur:.55,cvr:.018,aov:1650,mob:.68,nw:.9,festive:1},
+  {id:'g3',ch:'google',name:'Performance Max — All Products',type:'PMax',lp:'/products/*',spend:2250,cpc:9,land:.9,pv:.63,co:.46,pur:.56,cvr:.022,aov:1750,mob:.72,nw:.72,festive:1},
+  {id:'g4',ch:'google',name:'Shopping — Dresses',type:'Shopping',lp:'/collections/dresses',spend:1200,cpc:8,land:.91,pv:.64,co:.46,pur:.56,cvr:.016,aov:2100,mob:.66,nw:.8},
+  {id:'m1',ch:'meta',name:'Prospecting — Festive Kurta Sets (Reels)',type:'Prospecting',lp:'/collections/festive-kurta-sets',spend:2600,cpc:4.5,land:.58,pv:.45,co:.44,pur:.55,cvr:.0075,aov:2400,mob:.9,nw:.9,festive:1,fatigue:1},
+  {id:'m2',ch:'meta',name:'Retargeting — Cart Abandoners',type:'Retargeting',lp:'/cart',spend:900,cpc:6,land:.86,pv:.7,co:.52,pur:.6,cvr:.028,aov:1950,mob:.85,nw:.28},
+  {id:'m3',ch:'meta',name:'Prospecting — Co-ord Sets UGC',type:'Prospecting',lp:'/collections/co-ord-sets',spend:1350,cpc:5,land:.74,pv:.55,co:.45,pur:.55,cvr:.011,aov:1800,mob:.88,nw:.88},
+  {id:'m4',ch:'meta',name:'Advantage+ Shopping',type:'ASC',lp:'/products/*',spend:1900,cpc:5.5,land:.8,pv:.62,co:.46,pur:.57,cvr:.016,aov:1900,mob:.86,nw:.75,festive:1}
+];
+CAMPAIGNS.forEach(c=>{c.atc=c.cvr/(c.pv*c.co*c.pur)});
+const CAMP = Object.fromEntries(CAMPAIGNS.map(c=>[c.id,c]));
+const DEV = {mobile:{land:.96,pv:.97,atc:.96,co:.9,pur:.86}, desktop:{land:1.08,pv:1.05,atc:1.08,co:1.15,pur:1.28}};
+const BENCH = {landRate:.85, pvRate:.6, atcRate:.11, coRate:.5, purRate:.6};
+
+const DAYS = 180;
+const TODAY = new Date(); TODAY.setHours(0,0,0,0);
+const ROWS = [];
+for (let d = DAYS-1; d >= 0; d--) {          // d = days ago, 0 = yesterday
+  const date = new Date(TODAY); date.setDate(date.getDate()-d-1);
+  const dow = date.getDay(), weekend = dow===0||dow===6;
+  const festive = d < 24 ? 1 + (24-d)/24*0.45 : 1;
+  const growth = 0.86 + (DAYS-d)/DAYS*0.14;
+  for (const c of CAMPAIGNS) {
+    const n = () => 0.88 + rnd()*0.24;
+    const fest = c.festive ? festive : 1 + (festive-1)*0.35;
+    const spend = c.spend * fest * growth * (weekend && c.ch==='meta' ? 1.08 : 1) * n();
+    let cpc = c.cpc * n(), cvrMult = (weekend ? 1.05 : 1) * (c.festive ? 1+(festive-1)*0.3 : 1);
+    if (c.fatigue && d < 12) { const f = (12-d)/12; cpc *= 1 + 0.38*f; cvrMult *= 1 - 0.45*f; }
+    const clicks = spend / cpc;
+    for (const dev of ['mobile','desktop']) {
+      const m = DEV[dev], share = dev==='mobile' ? c.mob : 1-c.mob;
+      const ck = clicks*share;
+      const landed = ck * Math.min(.98, c.land*m.land*n());
+      const pv = landed * Math.min(.95, c.pv*m.pv*n());
+      const atc = pv * Math.min(.6, c.atc*m.atc*n()*Math.sqrt(cvrMult));
+      const co = atc * Math.min(.9, c.co*m.co*n());
+      const orders = co * Math.min(.95, c.pur*m.pur*n()*Math.sqrt(cvrMult));
+      const revenue = orders * c.aov * (dev==='desktop'?1.12:1) * n();
+      ROWS.push({d, t:date.getTime(), c:c.id, ch:c.ch, dev, lp:c.lp, spend:spend*share, clicks:ck, landed, pv, atc, co, orders, revenue, newOrders:orders*c.nw});
+    }
+  }
+}
+
+/* =========================================================
+   STATE
+   ========================================================= */
+const KEY = 'clicktrail_demo_v1';
+const DEFAULT_STATE = () => ({view:'integrations', connected:{}, accounts:{}, filters:{range:30,channel:'all',campaign:'all',device:'all',lp:'all'}, trend:'rev', sort:{key:'spend',dir:-1}, chat:[], wa:{daily:true,weekly:true,alerts:true}, syncedAt:Date.now()});
+let state;
+try { state = JSON.parse(localStorage.getItem(KEY)) || DEFAULT_STATE(); } catch(e) { state = DEFAULT_STATE(); }
+if (location.search.includes('reset')) { state = DEFAULT_STATE(); history.replaceState(null,'',location.pathname); }
+if (state.storeName) CONFIG.storeName = state.storeName;
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+
+const adChans = () => ['google','meta'].filter(k => state.connected[k]);
+const nConnected = () => Object.keys(SOURCES).filter(k => state.connected[k]).length;
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtN = v => Math.round(v).toLocaleString('en-IN');
+const fmtINR = v => v >= 1e7 ? '₹'+(v/1e7).toFixed(2)+' Cr' : v >= 1e5 ? '₹'+(v/1e5).toFixed(2)+' L' : '₹'+Math.round(v).toLocaleString('en-IN');
+const pct = (v,d=1) => (v*100).toFixed(d)+'%';
+const x2 = v => v.toFixed(2)+'x';
+const fmtDate = t => new Date(t).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+const RANGE_LABEL = {1:'Yesterday',7:'Last 7 days',14:'Last 14 days',30:'Last 30 days',90:'Last 90 days'};
+const chName = k => k==='google' ? 'Google Ads' : 'Meta Ads';
+const chColor = k => SOURCES[k].color;
+
+function filterRows(f, period=0, R=f.range, ignoreDate=false) {
+  const ch = adChans(), lo = period*R, hi = lo+R;
+  return ROWS.filter(r => (ignoreDate || (r.d>=lo && r.d<hi)) && ch.includes(r.ch)
+    && (f.channel==='all'||r.ch===f.channel) && (f.campaign==='all'||r.c===f.campaign)
+    && (f.device==='all'||r.dev===f.device) && (f.lp==='all'||r.lp===f.lp));
+}
+function agg(rows) {
+  const s = {spend:0,clicks:0,landed:0,pv:0,atc:0,co:0,orders:0,revenue:0,newOrders:0};
+  for (const r of rows) for (const k in s) s[k] += r[k];
+  return derive(s);
+}
+function derive(s) {
+  s.roas = s.spend ? s.revenue/s.spend : 0;
+  s.cvr = s.landed ? s.orders/s.landed : 0;
+  s.cpo = s.orders ? s.spend/s.orders : 0;
+  s.aov = s.orders ? s.revenue/s.orders : 0;
+  s.cpc = s.clicks ? s.spend/s.clicks : 0;
+  s.landRate = s.clicks ? s.landed/s.clicks : 0;
+  s.pvRate = s.landed ? s.pv/s.landed : 0;
+  s.atcRate = s.pv ? s.atc/s.pv : 0;
+  s.atcOfLanded = s.landed ? s.atc/s.landed : 0;
+  s.coRate = s.atc ? s.co/s.atc : 0;
+  s.purRate = s.co ? s.orders/s.co : 0;
+  s.bounce = s.landed ? 1 - s.pvRate : 0;
+  return s;
+}
+function groupBy(rows, fn) {
+  const m = {};
+  for (const r of rows) (m[fn(r)] ||= []).push(r);
+  return Object.entries(m).map(([k,v]) => Object.assign(agg(v), {key:k}));
+}
+const STAGES = [
+  {k:'landRate', label:'Click → landed on site', short:'Landing', bad:r=>`${pct(1-r,0)} of ad clicks never reach your site`, why:'Usually a slow mobile page, redirects, or the in-app browser closing before load.'},
+  {k:'pvRate',   label:'Landed → viewed a product', short:'Product view', bad:r=>`${pct(1-r,0)} leave without opening a product`, why:'The landing page doesn’t match the ad, or products are buried below the fold.'},
+  {k:'atcRate',  label:'Product view → add to cart', short:'Add to cart', bad:r=>`only ${pct(r,1)} of product viewers add to cart`, why:'Price, size availability, photos or delivery promise aren’t convincing.'},
+  {k:'coRate',   label:'Cart → checkout', short:'Checkout start', bad:r=>`${pct(1-r,0)} of carts never reach checkout`, why:'Shipping cost surprises, forced login, or no COD visible in the cart.'},
+  {k:'purRate',  label:'Checkout → purchase', short:'Payment', bad:r=>`${pct(1-r,0)} drop off at checkout`, why:'Payment failures, OTP friction, or COD restrictions at the last step.'}
+];
+function leakOf(A) {
+  let worst = null;
+  for (const s of STAGES) {
+    const r = A[s.k], b = BENCH[s.k]; if (!r) continue;
+    const ratio = r/b;
+    if (!worst || ratio < worst.ratio) worst = {...s, rate:r, bench:b, ratio};
+  }
+  if (!worst) return null;
+  worst.extraOrders = worst.ratio < 1 ? A.orders*(1/worst.ratio - 1) : 0;
+  worst.extraRev = worst.extraOrders * A.aov;
+  return worst;
+}
+function delta(cur, prev, mode='up') {
+  if (!prev) return '<span class="d neu">—</span>';
+  const ch = (cur-prev)/prev, arrow = ch>=0 ? '▲' : '▼';
+  let cls = mode==='neutral' ? 'neu' : ((ch>=0) === (mode==='up') ? 'good' : 'bad');
+  if (Math.abs(ch) < 0.005) cls = 'neu';
+  return `<span class="d ${cls}">${arrow} ${Math.abs(ch*100).toFixed(1)}% <small>vs prev.</small></span>`;
+}
+function chgWord(cur, prev) {
+  if (!prev) return '';
+  const ch = (cur-prev)/prev;
+  return `<span class="${ch>=0?'pos':'neg'}">${ch>=0?'up':'down'} ${Math.abs(ch*100).toFixed(0)}%</span>`;
+}
+function scopeLabel(f) {
+  const parts = [];
+  parts.push(f.channel==='all' ? (adChans().length===2 ? 'Google + Meta' : chName(adChans()[0]||'google')) : chName(f.channel));
+  if (f.campaign!=='all') parts.push(CAMP[f.campaign].name);
+  if (f.device!=='all') parts.push(f.device==='mobile'?'Mobile':'Desktop');
+  if (f.lp!=='all') parts.push(LPS[f.lp].name);
+  return parts.join(' · ');
+}
+function toast(msg) { const t=$('toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2600); }
+function ago(ts) { const m = Math.max(1, Math.round((Date.now()-ts)/60000)); return m<60 ? m+' min ago' : Math.round(m/60)+' h ago'; }
+function logo(k, size=42) { const s=SOURCES[k]; return `<div class="lg" style="background:${s.color};width:${size}px;height:${size}px;font-size:${size<36?11:13}px">${s.short}</div>`; }
+
+/* =========================================================
+   CHART (hand-rolled SVG)
+   ========================================================= */
+const CHARTS = {};
+function lineChart(id, labels, series, fmt) {
+  const W=640, H=300, pl=62, pr=12, pt=14, pb=34;
+  const all = series.flatMap(s=>s.values);
+  const max = Math.max(...all, 0.0001) * 1.12;
+  const X = i => pl + (labels.length<2 ? (W-pl-pr)/2 : i*(W-pl-pr)/(labels.length-1));
+  const Y = v => pt + (H-pt-pb)*(1 - v/max);
+  let g = '';
+  for (let i=0;i<=4;i++) { const v=max*i/4, y=Y(v); g += `<line x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}" stroke="#eef0f3"/><text x="${pl-8}" y="${y+4}" text-anchor="end" font-size="13" fill="#94a3b8">${fmt(v)}</text>`; }
+  const step = Math.max(1, Math.ceil(labels.length/5));
+  labels.forEach((l,i) => { if (i%step===0 || i===labels.length-1) g += `<text x="${X(i)}" y="${H-8}" text-anchor="middle" font-size="13" fill="#94a3b8">${l}</text>`; });
+  series.forEach((s,si) => {
+    const pts = s.values.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+    if (si===0) g += `<polygon points="${X(0)},${Y(0)} ${pts} ${X(s.values.length-1)},${Y(0)}" fill="${s.color}" opacity=".08"/>`;
+    g += `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2.4" stroke-linejoin="round" ${s.dash?'stroke-dasharray="5 4"':''}/>`;
+  });
+  g += `<line class="hl" x1="0" x2="0" y1="${pt}" y2="${H-pb}" stroke="#94a3b8" stroke-dasharray="3 3" opacity="0"/>`;
+  series.forEach((s,si)=>{ g += `<circle class="hd hd${si}" r="4.5" fill="#fff" stroke="${s.color}" stroke-width="2.4" opacity="0"/>`; });
+  CHARTS[id] = {labels, series, fmt, W, pl, pr, X, Y};
+  return `<div class="chart" data-chart="${id}"><svg viewBox="0 0 ${W} ${H}">${g}</svg><div class="tip"></div></div>`;
+}
+function bindCharts() {
+  document.querySelectorAll('[data-chart]').forEach(el => {
+    const c = CHARTS[el.dataset.chart]; if (!c) return;
+    const svg = el.querySelector('svg'), tip = el.querySelector('.tip'), hl = svg.querySelector('.hl');
+    const move = e => {
+      const r = svg.getBoundingClientRect(), sc = r.width / c.W;
+      const px = ((e.touches?e.touches[0].clientX:e.clientX) - r.left)/sc;
+      const n = c.labels.length;
+      let i = n<2 ? 0 : Math.round((px-c.pl)/((c.W-c.pl-c.pr)/(n-1)));
+      i = Math.max(0, Math.min(n-1, i));
+      const x = c.X(i);
+      hl.setAttribute('x1',x); hl.setAttribute('x2',x); hl.setAttribute('opacity',1);
+      c.series.forEach((s,si)=>{ const d=svg.querySelector('.hd'+si); d.setAttribute('cx',x); d.setAttribute('cy',c.Y(s.values[i])); d.setAttribute('opacity',1); });
+      tip.innerHTML = `<b>${c.labels[i]}</b><br>` + c.series.map(s=>`<span style="color:${s.color}">●</span> ${s.name}: ${c.fmt(s.values[i],true)}`).join('<br>');
+      tip.style.opacity = 1;
+      const left = x*sc + 12, w = tip.offsetWidth;
+      tip.style.left = (left + w > r.width ? x*sc - w - 12 : left) + 'px';
+      tip.style.top = '10px';
+    };
+    const out = () => { tip.style.opacity=0; hl.setAttribute('opacity',0); svg.querySelectorAll('.hd').forEach(d=>d.setAttribute('opacity',0)); };
+    svg.addEventListener('mousemove', move); svg.addEventListener('touchmove', move, {passive:true});
+    svg.addEventListener('mouseleave', out);
+  });
+}
+
+/* =========================================================
+   VIEWS
+   ========================================================= */
+const TITLES = {report:'Post-click report', ask:'Ask AI', whatsapp:'WhatsApp reports', integrations:'Integrations', settings:'Settings'};
+
+function render() {
+  $('chatHolder').appendChild($('chat'));
+  const v = state.view;
+  document.querySelectorAll('.nav').forEach(n => n.classList.toggle('on', n.dataset.view===v));
+  $('title').textContent = TITLES[v];
+  $('appName').textContent = CONFIG.appName;
+  $('wsName').textContent = CONFIG.storeName;
+  $('wsDomain').textContent = CONFIG.storeDomain;
+  $('intPill').textContent = nConnected()+'/4';
+  $('sync').innerHTML = nConnected() ? `<span class="txt">Synced ${ago(state.syncedAt)}</span><button class="icon-btn" title="Refresh data" data-act="refresh"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"/><path d="M21 3v5h-5"/></svg></button>` : '';
+  const html = {report:viewReport, ask:viewAsk, whatsapp:viewWhatsApp, integrations:viewIntegrations, settings:viewSettings}[v]();
+  $('view').innerHTML = html;
+  bindCharts();
+  if (v==='ask') $('askMount').appendChild($('chat'));
+  else if ($('drawer').classList.contains('on')) $('drawerBody').appendChild($('chat'));
+  $('fab').style.display = (v==='ask' || !adChans().length || $('drawer').classList.contains('on')) ? 'none' : 'flex';
+  renderChatMeta();
+  save();
+}
+
+function needConnect() {
+  return `<div class="card empty">
+    <div class="okbig" style="background:var(--brand-soft);color:var(--brand)">⚡</div>
+    <h2>Connect an ad account to see your report</h2>
+    <p>Link Google Ads or Meta Ads (plus Shopify and GA4 for full accuracy). We’ll stitch every ad click to what the shopper did on your site.</p>
+    <button class="btn pri" data-act="go" data-view="integrations">Connect data sources</button></div>`;
+}
+
+function missingBanner() {
+  const miss = Object.keys(SOURCES).filter(k=>!state.connected[k]);
+  if (!miss.length) return '';
+  const names = miss.map(k=>SOURCES[k].name);
+  const msg = miss.includes('shopify') && miss.includes('ga4') ? 'Orders and on-site steps are estimated from ad-platform pixels.'
+    : miss.includes('shopify') ? 'Orders and revenue are estimated from ad-platform conversions.'
+    : miss.includes('ga4') ? 'On-site steps (product views, cart, checkout) are modelled.' : 'Connect it to include that channel in the report.';
+  return `<div class="banner"><span>⚠️ <b>${names.join(', ')}</b> not connected. ${msg}</span><button class="btn sm" data-act="go" data-view="integrations">Connect</button></div>`;
+}
+
+function viewReport() {
+  if (!adChans().length) return needConnect();
+  const f = state.filters;
+  if (f.channel!=='all' && !state.connected[f.channel]) f.channel='all';
+  if (f.campaign!=='all' && !adChans().includes(CAMP[f.campaign].ch)) f.campaign='all';
+  const rows = filterRows(f), A = agg(rows), P = agg(filterRows(f,1));
+
+  // filter bar
+  const camps = CAMPAIGNS.filter(c => adChans().includes(c.ch) && (f.channel==='all'||c.ch===f.channel));
+  const opt = (v,l,cur) => `<option value="${v}" ${String(v)===String(cur)?'selected':''}>${esc(l)}</option>`;
+  const active = ['channel','campaign','device','lp'].filter(k=>f[k]!=='all').length;
+  let h = `<p class="sub">What happens after someone clicks your ad — from the click, to the page, to the cart, to the order.</p>${missingBanner()}
+  <div class="filters">
+    <label>Date range<select data-filter="range">${[7,14,30,90].map(r=>opt(r,RANGE_LABEL[r],f.range)).join('')}</select></label>
+    <label>Channel<select data-filter="channel">${opt('all','All channels',f.channel)}${adChans().map(k=>opt(k,chName(k),f.channel)).join('')}</select></label>
+    <label>Campaign<select data-filter="campaign">${opt('all','All campaigns',f.campaign)}${camps.map(c=>opt(c.id,c.name,f.campaign)).join('')}</select></label>
+    <label>Device<select data-filter="device">${opt('all','All devices',f.device)}${opt('mobile','Mobile',f.device)}${opt('desktop','Desktop',f.device)}</select></label>
+    <label>Landing page<select data-filter="lp">${opt('all','All landing pages',f.lp)}${Object.keys(LPS).map(k=>opt(k,LPS[k].name,f.lp)).join('')}</select></label>
+    <div class="sp"></div>
+    ${active?`<button class="btn sm ghost" data-act="clearFilters">Clear ${active} filter${active>1?'s':''}</button>`:''}
+    <button class="btn sm" data-act="openChat">✨ Ask about this view</button>
+  </div>`;
+
+  if (!A.clicks) return h + `<div class="card empty"><h2>No clicks match these filters</h2><p>Try a wider date range or clear a filter.</p><button class="btn" data-act="clearFilters">Clear filters</button></div>`;
+
+  // KPIs
+  const K = [
+    ['Ad spend', fmtINR(A.spend), delta(A.spend,P.spend,'neutral')],
+    ['Revenue', fmtINR(A.revenue), delta(A.revenue,P.revenue)],
+    ['ROAS', x2(A.roas), delta(A.roas,P.roas)],
+    ['Orders', fmtN(A.orders), delta(A.orders,P.orders)],
+    ['Ad clicks', fmtN(A.clicks), delta(A.clicks,P.clicks,'neutral')],
+    ['Clicks that landed', pct(A.landRate), delta(A.landRate,P.landRate)],
+    ['Conversion rate', pct(A.cvr,2), delta(A.cvr,P.cvr)],
+    ['Cost per order', fmtINR(A.cpo), delta(A.cpo,P.cpo,'down')]
+  ];
+  h += `<div class="grid g4">${K.map(k=>`<div class="card kpi"><div class="l">${k[0]}</div><div class="v">${k[1]}</div>${k[2]}</div>`).join('')}</div>`;
+
+  // insights
+  const L = leakOf(A);
+  const lpRows = groupBy(rows, r=>r.lp).filter(x=>x.clicks > A.clicks*0.05).sort((a,b)=>a.landRate-b.landRate);
+  const worstLp = lpRows[0];
+  const fat = fatigueAlert();
+  const campAgg = groupBy(rows, r=>r.c).filter(x=>x.spend > A.spend*0.05).sort((a,b)=>b.roas-a.roas);
+  const ins = [];
+  if (L) ins.push(`<div class="card ins ${L.ratio<0.85?'bad':'warn'}"><div class="ic">↘</div><div><b>Biggest leak: ${L.short}</b><p>${cap(L.bad(L.rate))} (benchmark ${pct(L.k==='atcRate'||L.k==='landRate'||L.k==='pvRate'||L.k==='coRate'||L.k==='purRate' ? (L.k==='atcRate'?L.bench:1-L.bench) : L.bench,0)}). Fixing it to benchmark ≈ <b style="display:inline">+${fmtN(L.extraOrders)} orders (${fmtINR(L.extraRev)})</b>.</p><button class="ask" data-ask="Where am I losing customers after the click?">Ask why →</button></div></div>`);
+  if (worstLp) ins.push(`<div class="card ins ${worstLp.landRate<0.75?'bad':'warn'}"><div class="ic">⏱</div><div><b>${LPS[worstLp.key].name} loses ${pct(1-worstLp.landRate,0)} of clicks</b><p>${LPS[worstLp.key].load}s mobile load time · ${pct(worstLp.bounce,0)} leave without viewing a product.</p><button class="ask" data-ask="Which landing page is hurting me?">See pages →</button></div></div>`);
+  if (fat) ins.push(`<div class="card ins bad"><div class="ic">!</div><div><b>${esc(fat.c.name)}: ROAS ${chgPlain(fat.cur.roas,fat.prev.roas)} this week</b><p>CPC ${chgPlain(fat.cur.cpc,fat.prev.cpc)}, conversion rate ${chgPlain(fat.cur.cvr,fat.prev.cvr)}. Likely creative fatigue.</p><button class="ask" data-ask="Why is my Meta ROAS dropping?">Ask why →</button></div></div>`);
+  else if (campAgg[0]) ins.push(`<div class="card ins good"><div class="ic">★</div><div><b>Top campaign: ${esc(campAgg[0].key ? CAMP[campAgg[0].key].name : '')}</b><p>${x2(campAgg[0].roas)} ROAS on ${fmtINR(campAgg[0].spend)} spend.</p><button class="ask" data-ask="Which campaign should I scale?">What to scale →</button></div></div>`);
+  h += `<div class="grid g3 mt">${ins.join('')}</div>`;
+
+  // funnel + trend
+  const st = [['Ad clicks','',A.clicks],['Landed on site','page loaded',A.landed],['Viewed a product','',A.pv],['Added to cart','',A.atc],['Reached checkout','',A.co],['Purchased','orders',A.orders]];
+  const fun = st.map((s,i) => {
+    const w = Math.max(0.6, s[2]/A.clicks*100);
+    const prev = i ? st[i-1][2] : 0, stage = i ? STAGES[i-1] : null;
+    const isLeak = L && stage && stage.k===L.k;
+    return `<div class="fun-row ${isLeak?'leak':''}"><div class="nm">${s[0]}<small>${pct(s[2]/A.clicks,1)} of clicks</small></div>
+      <div class="bar"><i style="width:${w}%"></i><span class="${w<18?'dark':''}" style="${w<18?`left:calc(${w}% + 8px)`:''}">${fmtN(s[2])}</span></div>
+      <div class="drop">${i?`<b>${pct(s[2]/prev,1)}</b> continue${isLeak?' <span class="tag bad">Biggest leak</span>':''}`:'<span class="tag neu">Start</span>'}</div></div>`;
+  }).join('');
+
+  const days = groupBy(rows, r=>r.d).sort((a,b)=>b.key-a.key);
+  const labels = days.map(x=>fmtDate(ROWS.find(r=>r.d==x.key).t));
+  let series, fmt;
+  if (state.trend==='rev') { series=[{name:'Revenue',color:'#4f46e5',values:days.map(x=>x.revenue)},{name:'Ad spend',color:'#f59e0b',values:days.map(x=>x.spend),dash:1}]; fmt=v=>fmtINR(v); }
+  else if (state.trend==='roas') { series=[{name:'ROAS',color:'#4f46e5',values:days.map(x=>x.roas)}]; fmt=v=>v.toFixed(1)+'x'; }
+  else { series=[{name:'Conversion rate',color:'#4f46e5',values:days.map(x=>x.cvr)},{name:'Landed rate ÷ 20',color:'#10b981',values:days.map(x=>x.landRate/20),dash:1}]; fmt=(v,tip)=>pct(v,2); }
+  if (state.trend==='cvr') series[1] = {name:'Clicks that landed',color:'#10b981',values:days.map(x=>x.landRate*0.04),dash:1,raw:days.map(x=>x.landRate)};
+  const chartFmt = state.trend==='cvr' ? (v)=>pct(v,2) : fmt;
+  h += `<div class="grid g2 mt">
+    <div class="card"><div class="card-h"><h3>Post-click journey</h3><span class="hint">${RANGE_LABEL[f.range]}</span></div><div class="card-b">${fun}
+      ${L?`<div class="note"><b>Why this leak usually happens:</b> ${L.why}</div>`:''}</div></div>
+    <div class="card"><div class="card-h"><h3>Trend</h3><div class="r"><div class="tabs">
+      <button class="${state.trend==='rev'?'on':''}" data-act="trend" data-t="rev">Revenue & spend</button>
+      <button class="${state.trend==='roas'?'on':''}" data-act="trend" data-t="roas">ROAS</button>
+      <button class="${state.trend==='cvr'?'on':''}" data-act="trend" data-t="cvr">Conversion</button></div></div></div>
+      <div class="card-b"><div class="legend" style="margin-bottom:8px">${(state.trend==='cvr'?[series[0]]:series).map(s=>`<span><i style="background:${s.color}"></i>${s.name}</span>`).join('')}</div>
+      ${lineChart('trend', labels, state.trend==='cvr'?[series[0]]:series, chartFmt)}</div></div>
+  </div>`;
+
+  // channel table
+  const chRows = groupBy(rows, r=>r.ch).sort((a,b)=>b.spend-a.spend);
+  if (f.channel==='all' && chRows.length>1) {
+    h += `<div class="card mt"><div class="card-h"><h3>Google vs Meta — after the click</h3><span class="hint">Same shopper journey, by channel</span></div><div class="tw"><table>
+    <thead><tr><th>Channel</th><th>Spend</th><th>Clicks</th><th>Landed</th><th>Viewed product</th><th>Add to cart</th><th>Checkout → paid</th><th>Conv. rate</th><th>Orders</th><th>Revenue</th><th>ROAS</th></tr></thead><tbody>
+    ${chRows.map(c=>`<tr><td><div class="cn"><span class="dot" style="background:${chColor(c.key)}"></span>${chName(c.key)}</div></td><td>${fmtINR(c.spend)}</td><td>${fmtN(c.clicks)}</td>
+      <td class="${c.landRate<BENCH.landRate*.9?'neg':''}">${pct(c.landRate,0)}</td><td>${pct(c.pvRate,0)}</td><td>${pct(c.atcOfLanded,1)}</td><td>${pct(c.purRate,0)}</td><td>${pct(c.cvr,2)}</td><td>${fmtN(c.orders)}</td><td>${fmtINR(c.revenue)}</td><td class="${c.roas<CONFIG.breakevenRoas?'neg':'pos'}">${x2(c.roas)}</td></tr>`).join('')}
+    </tbody></table></div></div>`;
+  }
+
+  // campaign table
+  const S = state.sort;
+  let cr = groupBy(rows, r=>r.c).map(x=>Object.assign(x,{name:CAMP[x.key].name,ch:CAMP[x.key].ch,leak:leakOf(x)}));
+  cr.sort((a,b)=> (typeof a[S.key]==='string' ? a[S.key].localeCompare(b[S.key]) : a[S.key]-b[S.key]) * S.dir);
+  const th = (k,l) => `<th class="s" data-act="sort" data-k="${k}">${l}${S.key===k?(S.dir<0?' ↓':' ↑'):''}</th>`;
+  h += `<div class="card mt"><div class="card-h"><h3>Campaigns</h3><span class="hint">Click a column to sort · click a row to filter</span></div><div class="tw"><table>
+    <thead><tr>${th('name','Campaign')}${th('spend','Spend')}${th('clicks','Clicks')}${th('landRate','Landed')}${th('atcOfLanded','Add to cart')}${th('cvr','Conv. rate')}${th('orders','Orders')}${th('revenue','Revenue')}${th('roas','ROAS')}<th>Weakest step</th></tr></thead><tbody>
+    ${cr.map(c=>`<tr style="cursor:pointer" data-act="pickCamp" data-c="${c.key}"><td><div class="cn"><span class="dot" style="background:${chColor(c.ch)}"></span>${esc(c.name)}</div></td><td>${fmtINR(c.spend)}</td><td>${fmtN(c.clicks)}</td>
+      <td class="${c.landRate<BENCH.landRate*.9?'neg':''}">${pct(c.landRate,0)}</td><td>${pct(c.atcOfLanded,1)}</td><td>${pct(c.cvr,2)}</td><td>${fmtN(c.orders)}</td><td>${fmtINR(c.revenue)}</td>
+      <td class="${c.roas<CONFIG.breakevenRoas?'neg':'pos'}">${x2(c.roas)}</td><td>${c.leak?`<span class="tag ${c.leak.ratio<.85?'bad':c.leak.ratio<1?'warn':'good'}">${c.leak.ratio<1?c.leak.short:'Healthy'}</span>`:''}</td></tr>`).join('')}
+    </tbody></table></div></div>`;
+
+  // landing pages + device
+  const lps = groupBy(rows, r=>r.lp).sort((a,b)=>b.clicks-a.clicks);
+  const dv = groupBy(rows, r=>r.dev);
+  const dvM = dv.find(x=>x.key==='mobile'), dvD = dv.find(x=>x.key==='desktop');
+  const devCard = (x, name, icon) => x ? `<div class="card dev"><h4>${icon} ${name} <span class="tag neu" style="margin-left:auto">${pct(x.clicks/A.clicks,0)} of clicks</span></h4><dl>
+      <dt>Clicks that landed</dt><dd>${pct(x.landRate,0)}</dd><dt>Viewed a product</dt><dd>${pct(x.pvRate,0)}</dd><dt>Cart → checkout</dt><dd>${pct(x.coRate,0)}</dd>
+      <dt>Checkout → paid</dt><dd>${pct(x.purRate,0)}</dd><dt>Conversion rate</dt><dd>${pct(x.cvr,2)}</dd><dt>ROAS</dt><dd>${x2(x.roas)}</dd></dl></div>` : '';
+  h += `<div class="grid mt lpgrid">
+    <div class="card"><div class="card-h"><h3>Landing pages</h3><span class="hint">Where ad clicks land</span></div><div class="tw"><table>
+      <thead><tr><th>Page</th><th>Clicks</th><th>Landed</th><th>Mobile load</th><th>Bounce</th><th>Conv. rate</th><th>Revenue</th></tr></thead><tbody>
+      ${lps.map(p=>`<tr><td><div class="cn" style="flex-direction:column;align-items:flex-start;gap:0">${LPS[p.key].name}<span style="font-weight:400;color:var(--ink3);font-size:11.5px">${p.key}</span></div></td><td>${fmtN(p.clicks)}</td>
+        <td class="${p.landRate<.75?'neg':''}">${pct(p.landRate,0)}</td><td class="${LPS[p.key].load>4?'neg':''}">${LPS[p.key].load}s</td><td class="${p.bounce>.5?'neg':''}">${pct(p.bounce,0)}</td><td>${pct(p.cvr,2)}</td><td>${fmtINR(p.revenue)}</td></tr>`).join('')}
+      </tbody></table></div></div>
+    <div class="grid" style="align-content:start">${devCard(dvM,'Mobile','📱')}${devCard(dvD,'Desktop','🖥')}</div>
+  </div>`;
+  return h;
+}
+const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+const chgPlain = (c,p) => p ? `${c>=p?'up':'down'} ${Math.abs((c-p)/p*100).toFixed(0)}%` : '—';
+function fatigueAlert() {
+  const f = state.filters;
+  let worst = null;
+  for (const c of CAMPAIGNS) {
+    if (!adChans().includes(c.ch)) continue;
+    if (f.channel!=='all' && c.ch!==f.channel) continue;
+    if (f.campaign!=='all' && c.id!==f.campaign) continue;
+    const ff = {...f, campaign:c.id};
+    const cur = agg(filterRows(ff,0,7)), prev = agg(filterRows(ff,1,7));
+    if (!prev.roas || !cur.clicks) continue;
+    const drop = (cur.roas-prev.roas)/prev.roas;
+    if (drop < -0.2 && (!worst || drop < worst.drop)) worst = {c, cur, prev, drop};
+  }
+  return worst;
+}
+
+/* ---------- Integrations ---------- */
+function viewIntegrations() {
+  const n = nConnected();
+  let h = `<p class="sub">Connect your ad accounts, store and analytics. Access is read-only — we never change your campaigns or store.</p>`;
+  if (n && adChans().length) h += `<div class="banner info"><span>✅ ${n} of 4 sources connected. Your post-click report is ready.</span><button class="btn pri sm" data-act="go" data-view="report">View report →</button></div>`;
+  h += `<div class="grid g2">` + Object.entries(SOURCES).map(([k,s]) => {
+    const on = state.connected[k], acc = state.accounts[k];
+    return `<div class="card int"><div class="hd">${logo(k)}<div><b>${s.name}</b><span>${s.kind}</span></div>
+      <span class="st ${on?'on':'off'}" style="margin-left:auto"><span class="dot"></span>${on?'Connected':'Not connected'}</span></div>
+      <p>${s.desc}</p>
+      ${on?`<div class="meta">${esc(acc||'')} · Last sync ${ago(state.syncedAt)}</div>`:''}
+      <div class="acts">${on?`<button class="btn sm" data-act="resync" data-k="${k}">Sync now</button><button class="btn sm ghost" data-act="disconnect" data-k="${k}">Disconnect</button>`:`<button class="btn pri sm" data-act="connect" data-k="${k}">Connect ${s.name.replace('Google Analytics 4','GA4')}</button>`}</div></div>`;
+  }).join('') + `</div>`;
+  return h;
+}
+
+/* ---------- Ask AI page ---------- */
+function viewAsk() {
+  if (!adChans().length) return needConnect();
+  return `<div class="card ask-page" id="askMount"></div>`;
+}
+
+/* ---------- WhatsApp ---------- */
+function waMessage() {
+  const f = {range:1,channel:'all',campaign:'all',device:'all',lp:'all'};
+  const A = agg(filterRows(f,0,1)), P = agg(filterRows(f,1,1));
+  const day = new Date(TODAY); day.setDate(day.getDate()-1);
+  const L = leakOf(A);
+  const camps = groupBy(filterRows(f,0,1), r=>r.c).filter(c=>c.spend>A.spend*.05).sort((a,b)=>b.roas-a.roas);
+  const lps = groupBy(filterRows(f,0,1), r=>r.lp).filter(x=>x.clicks>A.clicks*.05).sort((a,b)=>a.landRate-b.landRate);
+  const arrow = (c,p) => c>=p ? '▲' : '▼';
+  return `*${CONFIG.storeName} · Daily post-click report*
+${day.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})}
+
+💰 Spend ${fmtINR(A.spend)} → Revenue ${fmtINR(A.revenue)}
+📈 ROAS *${x2(A.roas)}* ${arrow(A.roas,P.roas)} ${Math.abs((A.roas-P.roas)/P.roas*100).toFixed(0)}%
+🛒 ${fmtN(A.orders)} orders · CVR ${pct(A.cvr,2)}
+
+⚠️ *Biggest leak:* ${L?cap(L.bad(L.rate)):'-'}
+${lps[0]?`📄 ${LPS[lps[0].key].name} lost ${pct(1-lps[0].landRate,0)} of clicks (${LPS[lps[0].key].load}s load)`:''}
+✅ *Best:* ${camps[0]?CAMP[camps[0].key].name+' — '+x2(camps[0].roas):'-'}
+
+Reply *1* campaigns · *2* landing pages · or just ask a question`;
+}
+function viewWhatsApp() {
+  if (!adChans().length) return needConnect();
+  const tg = (k,b,s) => `<div class="set-row"><div><b>${b}</b><span>${s}</span></div><button class="tog ${state.wa[k]?'on':''}" data-act="waTog" data-k="${k}" aria-label="${b}"></button></div>`;
+  const camps = groupBy(filterRows({range:1,channel:'all',campaign:'all',device:'all',lp:'all'},0,1), r=>r.c).sort((a,b)=>b.revenue-a.revenue).slice(0,4);
+  return `<p class="sub">Your report, delivered on WhatsApp every morning. No dashboard login needed — reply to ask follow-up questions.</p>
+  <div class="grid g2">
+    <div class="card"><div class="card-h"><h3>Delivery</h3></div><div class="card-b">
+      <div class="set-row"><div><b>Send to</b><span>${CONFIG.whatsappNumber}</span></div><button class="btn sm" data-act="waEdit">Change</button></div>
+      ${tg('daily','Daily report — 9:00 AM','Yesterday’s spend, ROAS, orders and the biggest leak')}
+      ${tg('weekly','Weekly summary — Monday 9:00 AM','Week-over-week by channel, campaign and landing page')}
+      ${tg('alerts','Instant alerts','When ROAS drops 20%+ or a landing page stops loading')}
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" data-act="waTest">Send test message</button><button class="btn" data-act="openChat">Preview replies in Ask AI</button></div>
+    </div></div>
+    <div><div class="phone"><div class="ph"><div class="ai-av" style="width:34px;height:34px;border-radius:50%">${CONFIG.appName[0]}</div><div><b>${CONFIG.appName}</b><span>Business account</span></div></div>
+      <div class="pb"><div class="wa">${esc(waMessage()).replace(/\*(.+?)\*/g,'<b>$1</b>')}<span class="tm">9:00 AM</span></div>
+      <div class="wa me">1<span class="tm">9:04 AM ✓✓</span></div>
+      <div class="wa"><b>Top campaigns yesterday</b>
+${camps.map(c=>`• ${esc(CAMP[c.key].name.split(' — ').pop())}: ${x2(c.roas)} · ${fmtN(c.orders)} orders`).join('\n')}<span class="tm">9:04 AM</span></div></div></div></div>
+  </div>`;
+}
+
+/* ---------- Settings ---------- */
+function viewSettings() {
+  return `<div class="card" style="max-width:720px"><div class="card-h"><h3>Workspace</h3></div><div class="card-b">
+    <div class="field" style="margin-bottom:12px">Store name<input id="setName" value="${esc(CONFIG.storeName)}"></div>
+    <div class="field" style="margin-bottom:12px">Break-even ROAS<input id="setBe" type="number" step="0.1" min="0.5" value="${CONFIG.breakevenRoas}"></div>
+    <button class="btn pri" data-act="saveSettings">Save</button>
+  </div></div>
+  <div class="card mt" style="max-width:720px"><div class="card-h"><h3>Demo</h3></div><div class="card-b">
+    <div class="set-row"><div><b>Reset workspace</b><span>Disconnects all sources and clears the chat, so you can show the setup flow again.</span></div><button class="btn" data-act="reset">Reset</button></div>
+  </div></div>`;
+}
+
+/* =========================================================
+   CONNECT FLOW (simulated — no real account is touched)
+   ========================================================= */
+let flow = null;
+function openConnect(k) {
+  flow = {k, step:0, acc: ACCOUNTS[k] ? ACCOUNTS[k][0].id : null, shop: CONFIG.shopifyHandle+'.myshopify.com'};
+  $('ov').classList.add('on'); drawFlow();
+}
+function closeModal() { $('ov').classList.remove('on'); if (flow) clearTimeout(flow.t); flow = null; }
+function drawFlow() {
+  const {k, step} = flow, s = SOURCES[k];
+  const head = `<div class="mh">${logo(k,36)}<b>Connect ${s.name}</b><button class="icon-btn x" data-act="closeModal">✕</button></div>`;
+  let body = '', foot = '';
+  if (step===0) {
+    body = `${k==='shopify'?`<div class="field">Store URL<input id="shopUrl" value="${esc(flow.shop)}"></div><div style="height:12px"></div>`:''}
+      <div style="font-size:13.5px;color:var(--ink2)">${CONFIG.appName} will be able to:</div>
+      <ul class="perm">${s.perms.map(p=>`<li>${p}</li>`).join('')}</ul>
+      <div class="note">🔒 You can disconnect anytime from Integrations. We store aggregated metrics only.</div>`;
+    foot = `<button class="btn" data-act="closeModal">Cancel</button><button class="btn pri" data-act="flowNext">Continue</button>`;
+  } else if (step===1) {
+    body = `<div class="center" style="padding:16px 0"><div class="spin"></div><b>Authorizing with ${s.name}…</b><div style="color:var(--ink2);font-size:13px;margin-top:4px">${k==='shopify'?'Installing app on '+esc(flow.shop):'Confirming read-only access'}</div></div>`;
+    flow.t = setTimeout(()=>{ if(!flow) return; flow.step = ACCOUNTS[k] ? 2 : 3; drawFlow(); }, 1500);
+  } else if (step===2) {
+    body = `<div style="font-size:13.5px;margin-bottom:10px;color:var(--ink2)">Choose the ${k==='ga4'?'property':'ad account'} to connect</div>` +
+      ACCOUNTS[k].map(a=>`<label class="acc ${flow.acc===a.id?'on':''}" data-act="pickAcc" data-id="${a.id}"><input type="radio" name="acc" ${flow.acc===a.id?'checked':''}><div><b>${esc(a.name())}</b><span>${a.id} · ${typeof a.meta==='function'?a.meta():a.meta}</span></div></label>`).join('');
+    foot = `<button class="btn" data-act="closeModal">Cancel</button><button class="btn pri" data-act="flowNext">Connect account</button>`;
+  } else if (step===3) {
+    body = `<div style="font-weight:600;margin-bottom:2px">Importing your data</div><div style="font-size:12.5px;color:var(--ink2)">This takes a moment the first time.</div>
+      <div class="prog"><i id="pg"></i></div><ul class="steps" id="syncSteps">${s.sync.map((x,i)=>`<li data-i="${i}"><span class="ck"></span>${x}</li>`).join('')}</ul>`;
+    setTimeout(runSync, 50);
+  } else {
+    const accName = flowAccName();
+    const stat = k==='shopify' ? `${fmtN(ROWS.filter(r=>r.d<90).reduce((a,r)=>a+r.orders,0))} orders · 90 days` : k==='ga4' ? `${fmtN(ROWS.filter(r=>r.d<90).reduce((a,r)=>a+r.landed,0))} sessions · 90 days` : `${CAMPAIGNS.filter(c=>c.ch===k).length} campaigns · 90 days`;
+    body = `<div class="center" style="padding:8px 0"><div class="okbig">✓</div><b style="font-size:16px">${s.name} connected</b><div style="color:var(--ink2);margin-top:4px;font-size:13px">${esc(accName)}<br>${stat} imported</div></div>`;
+    foot = `<button class="btn" data-act="closeModal">Connect another</button><button class="btn pri" data-act="finishFlow">${adChans().length?'View report':'Done'}</button>`;
+  }
+  $('modal').innerHTML = head + `<div class="mb">${body}</div>` + (foot?`<div class="mf">${foot}</div>`:'');
+}
+function flowAccName() {
+  const {k} = flow;
+  if (k==='shopify') return flow.shop;
+  const a = ACCOUNTS[k].find(a=>a.id===flow.acc); return a.name()+' ('+a.id+')';
+}
+function runSync() {
+  const steps = SOURCES[flow.k].sync; let i = 0;
+  const tick = () => {
+    if (!flow || flow.step!==3) return;
+    const lis = document.querySelectorAll('#syncSteps li');
+    lis.forEach((li,j)=>{ li.className = j<i?'done':j===i?'now':''; li.querySelector('.ck').innerHTML = j<i?'✓':j===i?'<span class="spin s"></span>':''; });
+    $('pg').style.width = (i/steps.length*100)+'%';
+    if (i >= steps.length) {
+      state.connected[flow.k] = true; state.accounts[flow.k] = flowAccName(); state.syncedAt = Date.now();
+      flow.t = setTimeout(()=>{ if(!flow) return; flow.step=4; drawFlow(); render(); }, 450);
+      return;
+    }
+    i++; flow.t = setTimeout(tick, 700 + Math.random()*500);
+  };
+  tick();
+}
+
+/* =========================================================
+   CHATBOT — answers computed from the same data as the report
+   ========================================================= */
+const SUGGEST = ['Where am I losing customers after the click?','Which campaign should I scale?','Which campaign is wasting money?','Google vs Meta — which is better?','Why is my Meta ROAS dropping?','How is mobile checkout doing?','Which landing page is hurting me?','Summary of yesterday','What should I fix first?'];
+
+function ctx(R) {
+  const f = {...state.filters}; R = R || f.range;
+  const rows = filterRows(f,0,R), prev = filterRows(f,1,R);
+  return {f, R, rows, prev, A:agg(rows), P:agg(prev), label:RANGE_LABEL[R]||`Last ${R} days`, scope:scopeLabel(f)};
+}
+const has = (t, arr) => arr.some(w => t.includes(w));
+const tbl = (head, rows) => `<div class="tw"><table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+const short = n => n.replace('Prospecting — ','').replace('Retargeting — ','Retarg. — ').replace('Performance Max — ','PMax — ');
+const byCamp = rows => groupBy(rows, r=>r.c).map(x=>Object.assign(x,{c:CAMP[x.key]}));
+
+function answer(q) {
+  const t = q.toLowerCase().trim();
+  if (!adChans().length) return `<p>I don’t have any data yet. Connect Google Ads or Meta Ads in <b>Integrations</b> and I’ll answer from your real post-click numbers.</p>`;
+  if (/^(hi|hello|hey|namaste|hii+|yo)\b/.test(t) && t.length < 25) return `<p>Hi! I’ve read your post-click data for <b>${ctx().label.toLowerCase()}</b>. Ask me where shoppers drop off, which campaigns to scale or cut, or anything else.</p>`;
+  if (has(t,['what can you','help me','how do you work','kya kar'])) return `<p>I answer questions using your connected Google Ads, Meta Ads, Shopify and GA4 data — the same numbers as the report. For example:</p><ul>${SUGGEST.slice(0,5).map(s=>`<li>${s}</li>`).join('')}</ul><p>I follow the filters you’ve set on the report.</p>`;
+  if (has(t,['meta','facebook','instagram',' fb','reels']) && has(t,['drop','down','fall','why','kyu','kyun','declin','worse','low','bad'])) return ansMetaDrop();
+  if ((has(t,['vs','versus','compare','comparison','better']) && has(t,['google','meta','facebook','channel'])) || has(t,['which channel','channels'])) return ansCompare();
+  if (has(t,['mobile','desktop','device','phone','laptop'])) return ansDevice();
+  if (has(t,['landing','page','slow','speed','bounce','load'])) return ansLanding();
+  if (has(t,['checkout','cart','abandon','cod','payment'])) return ansCheckout();
+  if (has(t,['waste','wasting','worst','pause','stop','losing money','burn','paisa','kharcha','cut','unprofitable','loss'])) return ansWaste();
+  if (has(t,['scale','best','top','winning','increase budget','double','more budget','profitable'])) return ansScale();
+  if (has(t,['aov','order value','basket'])) return ansAov();
+  if (has(t,['new customer','returning','repeat','new vs','first-time','first time'])) return ansNewRet();
+  if (has(t,['cost per','cpa','cac','cpo','acquisition cost'])) return ansCpo();
+  if (has(t,['revenue','sales','roas','orders']) && has(t,['drop','down','why','fell','increase','up','change','trend'])) return ansTrend();
+  if (has(t,['losing','leak','drop','funnel','journey','after the click','after click','post-click','post click','kahan','kaha','where do'])) return ansLeak();
+  if (has(t,['should i','recommend','suggest','what to do','fix first','next step','action','advice','karu','karna','priorit'])) return ansRecs();
+  if (has(t,['spend','budget','spent'])) return ansSpend();
+  if (has(t,['yesterday','kal '])) return ansSummary(1);
+  if (has(t,['week'])) return ansSummary(7);
+  if (has(t,['month'])) return ansSummary(30);
+  if (has(t,['summary','overview','how did','how are','how is','how was','report','performance','kaisa','status','roas'])) return ansSummary();
+  return `<p>I couldn’t match that to your report data yet. I can answer about drop-offs, campaigns, channels, landing pages, devices, checkout, spend and ROAS. Try one of these:</p><ul>${SUGGEST.slice(0,4).map(s=>`<li>${s}</li>`).join('')}</ul>`;
+}
+
+function ansSummary(R) {
+  const x = ctx(R), {A,P} = x;
+  if (!A.clicks) return `<p>No data for ${x.label.toLowerCase()} with the current filters.</p>`;
+  const camps = byCamp(x.rows).filter(c=>c.spend>A.spend*.04).sort((a,b)=>b.roas-a.roas);
+  const L = leakOf(A);
+  return `<p><b>${x.label}</b> · ${x.scope}</p><ul>
+    <li>Spent <b>${fmtINR(A.spend)}</b>, made <b>${fmtINR(A.revenue)}</b> → ROAS <b>${x2(A.roas)}</b> (${chgWord(A.roas,P.roas)} vs the period before).</li>
+    <li><b>${fmtN(A.orders)} orders</b> from ${fmtN(A.clicks)} ad clicks · ${fmtINR(A.cpo)} per order.</li>
+    <li>Only <b>${pct(A.landRate,0)}</b> of clicks actually loaded your site.</li>
+    ${camps[0]?`<li>Best: <b>${esc(camps[0].c.name)}</b> at ${x2(camps[0].roas)}.</li>`:''}
+    ${camps.length>1?`<li>Weakest: <b>${esc(camps[camps.length-1].c.name)}</b> at ${x2(camps[camps.length-1].roas)}.</li>`:''}
+    ${L?`<li>Biggest leak: <b>${L.short}</b> — ${L.bad(L.rate)}.</li>`:''}</ul>`;
+}
+function ansLeak() {
+  const x = ctx(), A = x.A, L = leakOf(A);
+  if (!A.clicks) return `<p>No clicks with the current filters.</p>`;
+  const rows = STAGES.map(s=>[s.label, `<b>${pct(A[s.k],1)}</b>`, pct(BENCH[s.k],0), A[s.k]/BENCH[s.k] < .9 ? '<span class="tag bad">Below</span>' : A[s.k]/BENCH[s.k] < 1 ? '<span class="tag warn">Slightly below</span>' : '<span class="tag good">OK</span>']);
+  return `<p>${x.label} · ${x.scope}. Out of <b>${fmtN(A.clicks)}</b> ad clicks, <b>${fmtN(A.orders)}</b> became orders. Here’s where people fall off:</p>
+    ${tbl(['Step','You','Benchmark',''], rows)}
+    ${L?`<p>The biggest leak is <b>${L.short.toLowerCase()}</b>: ${L.bad(L.rate)}. ${L.why}</p>
+    <div class="act">💡 Bringing this step to benchmark would add roughly <b>${fmtN(L.extraOrders)} orders (${fmtINR(L.extraRev)})</b> over the same period, without spending more on ads.</div>`:''}`;
+}
+function ansScale() {
+  const x = ctx(), A = x.A;
+  const camps = byCamp(x.rows).filter(c=>c.spend>A.spend*.03).sort((a,b)=>b.roas-a.roas);
+  if (!camps.length) return `<p>Not enough campaign data with the current filters.</p>`;
+  const capped = c => ['Retargeting'].includes(c.c.type) || c.c.name.includes('Brand');
+  const scalable = camps.filter(c=>!capped(c) && c.roas > A.roas);
+  return `<p>Ranked by ROAS for ${x.label.toLowerCase()} (blended ${x2(A.roas)}):</p>
+    ${tbl(['Campaign','Spend','ROAS','Orders'], camps.slice(0,5).map(c=>[esc(short(c.c.name)), fmtINR(c.spend), `<span class="${c.roas<CONFIG.breakevenRoas?'neg':'pos'}">${x2(c.roas)}</span>`, fmtN(c.orders)]))}
+    ${scalable.length?`<div class="act">📈 Scale <b>${esc(scalable[0].c.name)}</b> first — ${x2(scalable[0].roas)} ROAS and it isn’t limited by audience size. Raise budget 15–20% every 3–4 days and watch cost per order (${fmtINR(scalable[0].cpo)} now).</div>`:''}
+    ${camps.some(capped)?`<p style="margin-top:6px;color:var(--ink2)">Brand search and retargeting look great on ROAS but are capped by how many people already know you — extra budget there rarely brings extra orders.</p>`:''}`;
+}
+function ansWaste() {
+  const x = ctx(), A = x.A;
+  const camps = byCamp(x.rows).filter(c=>c.spend>A.spend*.03).sort((a,b)=>a.roas-b.roas);
+  const bad = camps.filter(c=>c.roas < CONFIG.breakevenRoas);
+  if (!bad.length) return `<p>Nothing is below your break-even ROAS of ${x2(CONFIG.breakevenRoas)} for ${x.label.toLowerCase()}. The weakest is <b>${esc(camps[0].c.name)}</b> at ${x2(camps[0].roas)}.</p>`;
+  const lost = bad.reduce((a,c)=>a + Math.max(0, c.spend - c.revenue/CONFIG.breakevenRoas), 0);
+  return `<p>${bad.length} campaign${bad.length>1?'s are':' is'} below your break-even ROAS of ${x2(CONFIG.breakevenRoas)} (${x.label.toLowerCase()}):</p>
+    ${tbl(['Campaign','Spend','ROAS','Weak step'], bad.map(c=>{const l=leakOf(c);return [esc(short(c.c.name)), fmtINR(c.spend), `<span class="neg">${x2(c.roas)}</span>`, l&&l.ratio<1?l.short:'—']}))}
+    <p>Roughly <b>${fmtINR(lost)}</b> of that spend didn’t pay for itself.</p>
+    <div class="act">✂️ Before pausing, check the weak step. If it’s <b>Landing</b>, the ad may be fine and the page is the problem — fix the page first. If it’s <b>Add to cart</b>, the offer or audience is off — cut budget 30% and test new creatives.</div>`;
+}
+function ansCompare() {
+  const x = ctx(), rows = groupBy(x.rows, r=>r.ch);
+  if (rows.length < 2) return `<p>Only ${chName(rows[0]?.key||adChans()[0])} is in the current view. Connect both ad platforms (or set Channel to “All”) to compare.</p>`;
+  const g = rows.find(r=>r.key==='google'), m = rows.find(r=>r.key==='meta');
+  return `<p>${x.label} — what happens after the click on each channel:</p>
+    ${tbl(['','Google','Meta'], [['Spend',fmtINR(g.spend),fmtINR(m.spend)],['Clicks',fmtN(g.clicks),fmtN(m.clicks)],['Cost per click','₹'+g.cpc.toFixed(1),'₹'+m.cpc.toFixed(1)],['Clicks that landed',pct(g.landRate,0),pct(m.landRate,0)],['Conversion rate',pct(g.cvr,2),pct(m.cvr,2)],['Cost per order',fmtINR(g.cpo),fmtINR(m.cpo)],['ROAS',x2(g.roas),x2(m.roas)]])}
+    <p>Meta clicks are ${(g.cpc/m.cpc).toFixed(1)}x cheaper, but only ${pct(m.landRate,0)} of them load your site versus ${pct(g.landRate,0)} on Google — most of that loss is the Instagram in-app browser closing on slow pages.</p>
+    <div class="act">💡 ${g.roas>m.roas?`Google is converting better right now. Before shifting budget, fix Meta’s landing loss — it’s cheaper than buying more clicks.`:`Meta is ahead on ROAS. Keep Google for high-intent search and put new budget into Meta’s best ad sets.`}</div>`;
+}
+function ansMetaDrop() {
+  if (!state.connected.meta) return `<p>Meta Ads isn’t connected yet. Connect it in Integrations and I can break this down.</p>`;
+  const f = {...state.filters, channel:'meta'};
+  const cur = agg(filterRows(f,0,7)), prev = agg(filterRows(f,1,7));
+  const camps = CAMPAIGNS.filter(c=>c.ch==='meta').map(c=>{const ff={...f,campaign:c.id};const a=agg(filterRows(ff,0,7)),b=agg(filterRows(ff,1,7));return {c,a,b,ch:b.roas?(a.roas-b.roas)/b.roas:0}}).sort((p,q)=>p.ch-q.ch);
+  const w = camps[0];
+  return `<p>Meta ROAS last 7 days: <b>${x2(cur.roas)}</b> vs ${x2(prev.roas)} the week before (${chgWord(cur.roas,prev.roas)}).</p>
+    ${tbl(['Campaign','ROAS now','Before','Change'], camps.map(c=>[esc(short(c.c.name)), x2(c.a.roas), x2(c.b.roas), `<span class="${c.ch<0?'neg':'pos'}">${c.ch>=0?'+':''}${(c.ch*100).toFixed(0)}%</span>`]))}
+    <p>Most of the drop comes from <b>${esc(w.c.name)}</b>: cost per click is ${chgWord(w.a.cpc,w.b.cpc)} and conversion rate is ${chgWord(w.a.cvr,w.b.cvr)}. Rising CPC with falling conversion is the classic sign of <b>creative fatigue</b> — the same people have seen these Reels too many times.</p>
+    <p>On top of that, it sends people to <b>${LPS[w.c.lp].name}</b>, which takes ${LPS[w.c.lp].load}s to load on mobile, so only ${pct(w.a.landRate,0)} of clicks even reach the page.</p>
+    <div class="act">💡 1) Launch 3–4 fresh Reels this week. 2) Point the ads to a faster product page until the collection page is fixed. 3) Don’t cut the budget yet — the drop is creative, not audience.</div>`;
+}
+function ansDevice() {
+  const x = ctx(), d = groupBy(x.rows, r=>r.dev), m = d.find(r=>r.key==='mobile'), k = d.find(r=>r.key==='desktop');
+  if (!m || !k) return `<p>The current filter shows only one device. Set Device to “All devices” to compare.</p>`;
+  const gap = 1 - m.purRate/k.purRate;
+  return `<p>${x.label}: <b>${pct(m.clicks/x.A.clicks,0)}</b> of your ad clicks come from mobile.</p>
+    ${tbl(['','Mobile','Desktop'], [['Clicks that landed',pct(m.landRate,0),pct(k.landRate,0)],['Viewed a product',pct(m.pvRate,0),pct(k.pvRate,0)],['Cart → checkout',pct(m.coRate,0),pct(k.coRate,0)],['Checkout → paid',pct(m.purRate,0),pct(k.purRate,0)],['Conversion rate',pct(m.cvr,2),pct(k.cvr,2)],['ROAS',x2(m.roas),x2(k.roas)]])}
+    <p>Mobile shoppers finish checkout <b>${pct(gap,0)} less often</b> than desktop. About ${fmtN(m.co - m.orders)} mobile shoppers reached checkout and didn’t pay.</p>
+    <div class="act">💡 Usual mobile fixes: show COD and delivery date in the cart, enable UPI intent / one-tap pay, and remove forced account login.</div>`;
+}
+function ansLanding() {
+  const x = ctx(), lps = groupBy(x.rows, r=>r.lp).filter(p=>p.clicks>x.A.clicks*.03).sort((a,b)=>a.landRate-b.landRate);
+  if (!lps.length) return `<p>No landing page data with the current filters.</p>`;
+  const w = lps[0];
+  return `<p>Landing pages ranked by how many clicks they lose (${x.label.toLowerCase()}):</p>
+    ${tbl(['Page','Clicks','Landed','Load','Conv.'], lps.map(p=>[LPS[p.key].name, fmtN(p.clicks), `<span class="${p.landRate<.75?'neg':''}">${pct(p.landRate,0)}</span>`, `<span class="${LPS[p.key].load>4?'neg':''}">${LPS[p.key].load}s</span>`, pct(p.cvr,2)]))}
+    <p><b>${LPS[w.key].name}</b> is hurting you most: ${fmtN(w.clicks - w.landed)} paid clicks never loaded it. At ${LPS[w.key].load}s on mobile, many shoppers give up before anything appears.</p>
+    <div class="act">💡 Compress the hero images/video on <code>${w.key}</code> and aim for under 3s. At your current conversion rate that’s about <b>${fmtN((w.clicks*BENCH.landRate - w.landed)*w.cvr)} extra orders</b> for the same spend.</div>`;
+}
+function ansCheckout() {
+  const x = ctx(), A = x.A, abandoned = A.atc - A.orders;
+  return `<p>${x.label} · ${x.scope}</p><ul>
+    <li><b>${fmtN(A.atc)}</b> shoppers added to cart → <b>${fmtN(A.co)}</b> started checkout (${pct(A.coRate,0)}) → <b>${fmtN(A.orders)}</b> paid (${pct(A.purRate,0)}).</li>
+    <li>That’s <b>${fmtN(abandoned)} abandoned carts</b>, worth about <b>${fmtINR(abandoned*A.aov)}</b> at your ${fmtINR(A.aov)} average order.</li>
+    <li>Benchmarks: cart → checkout ${pct(BENCH.coRate,0)}, checkout → paid ${pct(BENCH.purRate,0)}.</li></ul>
+    <div class="act">💡 A WhatsApp cart-recovery message within 30 minutes typically wins back 5–10% of abandoned carts — around <b>${fmtN(abandoned*.07)} orders</b> here.</div>`;
+}
+function ansAov() {
+  const x = ctx(), camps = byCamp(x.rows).filter(c=>c.orders>1).sort((a,b)=>b.aov-a.aov);
+  return `<p>Average order value for ${x.label.toLowerCase()}: <b>${fmtINR(x.A.aov)}</b> (${chgWord(x.A.aov,x.P.aov)}).</p>
+    ${tbl(['Campaign','AOV','Orders'], camps.map(c=>[esc(short(c.c.name)), fmtINR(c.aov), fmtN(c.orders)]))}`;
+}
+function ansNewRet() {
+  const x = ctx(), A = x.A, nw = A.newOrders/A.orders;
+  const camps = byCamp(x.rows).filter(c=>c.orders>1).sort((a,b)=>b.newOrders/b.orders - a.newOrders/a.orders);
+  return `<p><b>${pct(nw,0)}</b> of orders from ads came from <b>new customers</b> (${fmtN(A.newOrders)} of ${fmtN(A.orders)}). Cost per new customer: <b>${fmtINR(A.spend/A.newOrders)}</b>.</p>
+    ${tbl(['Campaign','New customers','Orders'], camps.map(c=>[esc(short(c.c.name)), pct(c.newOrders/c.orders,0), fmtN(c.orders)]))}
+    <p style="color:var(--ink2)">Retargeting and brand search mostly re-sell to people who already know you — judge them on ROAS, and prospecting on cost per new customer.</p>`;
+}
+function ansCpo() {
+  const x = ctx(), ch = groupBy(x.rows, r=>r.ch);
+  return `<p>Cost per order for ${x.label.toLowerCase()}: <b>${fmtINR(x.A.cpo)}</b> (${chgWord(x.A.cpo,x.P.cpo)}). Against an average order of ${fmtINR(x.A.aov)}, ads take ${pct(x.A.cpo/x.A.aov,0)} of each order.</p>
+    ${tbl(['Channel','Cost per order','Orders'], ch.map(c=>[chName(c.key), fmtINR(c.cpo), fmtN(c.orders)]))}`;
+}
+function ansSpend() {
+  const x = ctx(), ch = groupBy(x.rows, r=>r.ch);
+  return `<p>You spent <b>${fmtINR(x.A.spend)}</b> in ${x.label.toLowerCase()} (${fmtINR(x.A.spend/x.R)}/day), ${chgWord(x.A.spend,x.P.spend)} vs the period before.</p>
+    ${tbl(['Channel','Spend','Share','ROAS'], ch.map(c=>[chName(c.key), fmtINR(c.spend), pct(c.spend/x.A.spend,0), x2(c.roas)]))}`;
+}
+function ansTrend() {
+  const f = state.filters, a = agg(filterRows(f,0,7)), b = agg(filterRows(f,1,7));
+  const camps = CAMPAIGNS.filter(c=>adChans().includes(c.ch)).map(c=>{const ff={...f,campaign:c.id};const p=agg(filterRows(ff,0,7)),q=agg(filterRows(ff,1,7));return {c,d:p.revenue-q.revenue}}).filter(c=>c.d).sort((p,q)=>p.d-q.d);
+  const down = camps.filter(c=>c.d<0).slice(0,2), up = camps.filter(c=>c.d>0).slice(-2).reverse();
+  return `<p>Last 7 days vs the 7 before: revenue <b>${fmtINR(a.revenue)}</b> (${chgWord(a.revenue,b.revenue)}), ROAS ${x2(a.roas)} (${chgWord(a.roas,b.roas)}), orders ${fmtN(a.orders)} (${chgWord(a.orders,b.orders)}).</p>
+    ${up.length?`<p>📈 Pulling up: ${up.map(c=>`<b>${esc(short(c.c.name))}</b> (+${fmtINR(c.d)})`).join(', ')} — festive demand is building.</p>`:''}
+    ${down.length?`<p>📉 Pulling down: ${down.map(c=>`<b>${esc(short(c.c.name))}</b> (−${fmtINR(-c.d)})`).join(', ')}.</p>`:''}
+    <p style="color:var(--ink2)">Ask “Why is my Meta ROAS dropping?” for the full breakdown.</p>`;
+}
+function ansRecs() {
+  const x = ctx(), A = x.A, L = leakOf(A);
+  const lps = groupBy(x.rows, r=>r.lp).filter(p=>p.clicks>A.clicks*.05).sort((a,b)=>a.landRate-b.landRate);
+  const fat = fatigueAlert();
+  const scal = byCamp(x.rows).filter(c=>c.spend>A.spend*.03 && c.c.type!=='Retargeting' && !c.c.name.includes('Brand')).sort((a,b)=>b.roas-a.roas)[0];
+  const items = [];
+  if (lps[0] && lps[0].landRate < .75) items.push(`<b>Speed up ${LPS[lps[0].key].name}</b> (${LPS[lps[0].key].load}s on mobile). It loses ${pct(1-lps[0].landRate,0)} of the clicks you paid for — the cheapest win available.`);
+  if (fat) items.push(`<b>Refresh creatives on ${esc(fat.c.name)}</b>. ROAS ${chgPlain(fat.cur.roas,fat.prev.roas)} this week with CPC rising.`);
+  if (L && L.k!=='landRate') items.push(`<b>Fix ${L.short.toLowerCase()}</b>: ${L.bad(L.rate)}. Worth ≈ ${fmtINR(L.extraRev)}.`);
+  items.push(`<b>Recover abandoned carts on WhatsApp</b> — ${fmtN(A.atc-A.orders)} carts left behind.`);
+  if (scal) items.push(`<b>Scale ${esc(scal.c.name)}</b> slowly (+15–20% every few days) — ${x2(scal.roas)} ROAS.`);
+  return `<p>Here’s what I’d do first, in order of impact for ${x.label.toLowerCase()}:</p><ol>${items.slice(0,4).map(i=>`<li>${i}</li>`).join('')}</ol>`;
+}
+
+/* chat UI */
+let busy = false;
+function renderChatMeta() {
+  $('chatScope').textContent = adChans().length ? `Using: ${RANGE_LABEL[state.filters.range]} · ${scopeLabel(state.filters)}` : '';
+  const used = new Set(state.chat.filter(m=>m.role==='me').map(m=>m.text));
+  $('chatSugg').innerHTML = SUGGEST.filter(s=>!used.has(s)).slice(0, state.chat.length?3:6).map(s=>`<button data-ask="${esc(s)}">${esc(s)}</button>`).join('');
+}
+function renderChat() {
+  const box = $('chatMsgs');
+  let h = '';
+  if (!state.chat.length) h = `<div class="ask-hero"><div class="ai-av" style="margin:0 auto;width:44px;height:44px;border-radius:12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/></svg></div><h2>Ask about your customers after the click</h2><p>Skip the charts — just ask. Answers use your connected ${adChans().map(chName).join(' & ')||'ad'} data.</p></div>`;
+  for (const m of state.chat) h += m.role==='me' ? `<div class="msg me"><div class="bub">${esc(m.text)}</div></div>` : `<div class="msg bot"><div class="ai-av">✦</div><div class="bub">${m.html}</div></div>`;
+  if (busy) h += `<div class="msg bot"><div class="ai-av">✦</div><div class="bub"><span class="typing"><i></i><i></i><i></i></span></div></div>`;
+  box.innerHTML = h;
+  box.scrollTop = box.scrollHeight;
+  renderChatMeta();
+}
+function ask(q) {
+  q = q.trim(); if (!q || busy) return;
+  state.chat.push({role:'me', text:q}); busy = true; renderChat();
+  setTimeout(() => {
+    let html; try { html = answer(q); } catch(e) { console.error(e); html = '<p>Something went wrong reading that data. Try asking another way.</p>'; }
+    state.chat.push({role:'bot', html}); busy = false; renderChat(); save();
+  }, 650 + Math.random()*700);
+}
+function openChat() {
+  if (!adChans().length) { state.view='integrations'; render(); toast('Connect an ad account first'); return; }
+  if (state.view==='ask') return;
+  $('drawer').classList.add('on'); $('drawerBody').appendChild($('chat')); $('fab').style.display='none';
+  renderChat(); setTimeout(()=>$('chatIn').focus(), 250);
+}
+function closeChat() { $('drawer').classList.remove('on'); $('chatHolder').appendChild($('chat')); render(); }
+
+/* =========================================================
+   EVENTS
+   ========================================================= */
+document.addEventListener('click', e => {
+  const askEl = e.target.closest('[data-ask]');
+  if (askEl) { if (state.view!=='ask' && !$('drawer').classList.contains('on')) openChat(); ask(askEl.dataset.ask); return; }
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const act = a.dataset.act;
+  switch (act) {
+    case 'go': state.view = a.dataset.view; $('side').classList.remove('on'); $('scrim').classList.remove('on'); if (state.view==='ask') $('drawer').classList.remove('on'); render(); if (state.view==='ask') renderChat(); window.scrollTo(0,0); break;
+    case 'openSide': $('side').classList.add('on'); $('scrim').classList.add('on'); break;
+    case 'closeSide': $('side').classList.remove('on'); $('scrim').classList.remove('on'); break;
+    case 'connect': openConnect(a.dataset.k); break;
+    case 'closeModal': closeModal(); break;
+    case 'flowNext':
+      if (flow.step===0 && flow.k==='shopify') { const v = $('shopUrl').value.trim(); if (!/\.myshopify\.com$/.test(v)) { toast('Enter your store’s .myshopify.com address'); return; } flow.shop = v; }
+      flow.step++; drawFlow(); break;
+    case 'pickAcc': flow.acc = a.dataset.id; drawFlow(); break;
+    case 'finishFlow': closeModal(); if (adChans().length) { state.view='report'; render(); window.scrollTo(0,0); } break;
+    case 'disconnect': delete state.connected[a.dataset.k]; delete state.accounts[a.dataset.k]; render(); toast(SOURCES[a.dataset.k].name+' disconnected'); break;
+    case 'resync': case 'refresh': {
+      const b = a; b.disabled = true; const old = b.innerHTML; b.innerHTML = '<span class="spin s"></span>';
+      setTimeout(()=>{ state.syncedAt = Date.now(); render(); toast('Data is up to date'); }, 1300); break; }
+    case 'clearFilters': Object.assign(state.filters,{channel:'all',campaign:'all',device:'all',lp:'all'}); render(); break;
+    case 'trend': state.trend = a.dataset.t; render(); break;
+    case 'sort': { const k = a.dataset.k; state.sort = state.sort.key===k ? {key:k,dir:-state.sort.dir} : {key:k,dir:k==='name'?1:-1}; render(); break; }
+    case 'pickCamp': state.filters.campaign = a.dataset.c; state.filters.channel = CAMP[a.dataset.c].ch; render(); window.scrollTo({top:0,behavior:'smooth'}); toast('Filtered to '+CAMP[a.dataset.c].name); break;
+    case 'openChat': openChat(); break;
+    case 'closeChat': closeChat(); break;
+    case 'expandChat': $('drawer').classList.remove('on'); state.view='ask'; render(); renderChat(); break;
+    case 'waTog': state.wa[a.dataset.k] = !state.wa[a.dataset.k]; render(); break;
+    case 'waTest': a.disabled = true; a.innerHTML = '<span class="spin s"></span> Sending…'; setTimeout(()=>{ render(); toast('Test report sent to '+CONFIG.whatsappNumber); }, 1400); break;
+    case 'waEdit': toast('Number changes need OTP verification on WhatsApp'); break;
+    case 'saveSettings': {
+      const n = $('setName').value.trim(); const be = parseFloat($('setBe').value);
+      if (n) { CONFIG.storeName = n; state.storeName = n; }
+      if (be > 0) CONFIG.breakevenRoas = be;
+      render(); toast('Settings saved'); break; }
+    case 'reset':
+      if (!confirm('Reset the demo workspace? This disconnects every source and clears the chat.')) return;
+      state = DEFAULT_STATE(); CONFIG.storeName = 'Kesar Lane'; $('drawer').classList.remove('on'); render(); toast('Workspace reset'); break;
+  }
+});
+document.addEventListener('change', e => {
+  const s = e.target.closest('[data-filter]'); if (!s) return;
+  const k = s.dataset.filter; state.filters[k] = k==='range' ? +s.value : s.value;
+  if (k==='channel') state.filters.campaign = 'all';
+  render();
+});
+$('chatForm').addEventListener('submit', e => { e.preventDefault(); const v = $('chatIn').value; $('chatIn').value=''; ask(v); });
+$('ov').addEventListener('click', e => { if (e.target.id==='ov' && flow && flow.step!==1 && flow.step!==3) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key==='Escape') { if ($('ov').classList.contains('on')) closeModal(); else if ($('drawer').classList.contains('on')) closeChat(); } });
+
+if (!adChans().length) state.view = 'integrations';
+else if (!state.view || state.view==='integrations') state.view = 'report';
+render(); renderChat();
+setInterval(()=>{ if (nConnected()) $('sync').querySelector('.txt') && ($('sync').querySelector('.txt').textContent = 'Synced '+ago(state.syncedAt)); }, 60000);
+</script>
+</body>
+</html>
