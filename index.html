@@ -7,7 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M8 21l5-6 4 4 7-9' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#f5f6f8; --panel:#fff; --ink:#0f172a; --ink2:#475569; --ink3:#94a3b8; --line:#e6e8ec; --line2:#f0f1f4;
@@ -18,7 +18,7 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-html,body{overflow-x:hidden}
+html,body{overflow-x:clip}
 .grid>*{min-width:0}
 body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit;color:inherit}
@@ -242,9 +242,12 @@ td .cn{display:flex;align-items:center;gap:8px;font-weight:550}
 .seg{display:inline-flex;background:#e9ebef;border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap;justify-content:center}
 .seg button{border:0;background:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;color:var(--ink2);cursor:pointer}
 .seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
-.iph{width:380px;max-width:100%;height:min(780px,calc(100vh - 170px));min-height:620px;border:12px solid #111;border-radius:54px;background:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(15,23,42,.22);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,"Segoe UI",Roboto,sans-serif;color:#111b21}
-.iph .isl{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:112px;height:32px;background:#000;border-radius:20px;z-index:5}
-.iph .ist{height:50px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:6px 30px 0;font-weight:600;font-size:15px;background:#fff}
+.iphf{position:relative;width:440px;max-width:100%;height:min(940px,calc(100vh - 120px));min-height:720px;padding:5px;border-radius:70px;background:linear-gradient(140deg,#f2f2f4 0%,#b8b9bf 28%,#e9e9ec 52%,#9fa0a6 78%,#dcdde0 100%);box-shadow:0 50px 90px -30px rgba(0,0,0,.45),0 18px 36px -18px rgba(0,0,0,.3),inset 0 0 1px rgba(0,0,0,.4);animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+.iphf>i{position:absolute;width:4px;border-radius:3px;background:linear-gradient(90deg,#8e8f95,#d4d5d9);left:-3px}
+.iphf>i.b1{top:150px;height:34px}.iphf>i.b2{top:215px;height:66px}.iphf>i.b3{top:295px;height:66px}.iphf>i.b4{left:auto;right:-3px;top:240px;height:104px}
+.iph{width:100%;height:100%;border:10px solid #0a0a0b;border-radius:65px;background:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,"Segoe UI",Roboto,sans-serif;color:#111b21}
+.iph .isl{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:122px;height:35px;background:#000;border-radius:20px;z-index:5}
+.iph .ist{height:56px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:8px 36px 0;font-weight:600;font-size:16px;background:#fff}
 .iph .ist .ic{display:flex;gap:5px;align-items:center}
 .iph .home{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:130px;height:5px;border-radius:9px;background:#111;z-index:5}
 #waScreen{flex:1;min-height:0;display:flex;flex-direction:column}
@@ -271,7 +274,7 @@ td .cn{display:flex;align-items:center;gap:8px;font-weight:550}
 .wl-row .mt{color:#8696a0;flex:none;display:flex}
 .av{width:48px;height:48px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;font-weight:600;font-size:17px}
 .av.sm{width:38px;height:38px;font-size:14px}
-.av.bot{background:#1f2c4c}.av.grp{background:#dfe5e7;color:#8696a0}
+.av.bot{background:radial-gradient(circle at 30% 25%,#ffd1a8 0,#ff8a65 30%,#a855f7 70%,#4f46e5 100%)}.av.grp{background:#dfe5e7;color:#8696a0}
 .vf{flex:none;display:flex}
 .wl-nav{flex:none;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #eef0f1;padding:8px 4px 22px;background:#fff}
 .wl-nav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;font-weight:600;color:#111b21}
@@ -298,7 +301,12 @@ td .cn{display:flex;align-items:center;gap:8px;font-weight:550}
 .wc-in{flex:none;display:flex;gap:6px;align-items:center;padding:7px 8px 24px;background:#efeae2}
 .wc-in input{flex:1;min-width:0;border:0;border-radius:22px;padding:11px 16px;font-size:15px;background:#fff;outline:none;font-family:inherit}
 .wc-in button{flex:none;width:44px;height:44px;border-radius:50%;border:0;background:#1daa61;color:#fff;display:grid;place-items:center}
-@media (max-width:520px){.seg{flex-wrap:nowrap}.seg button{padding:6px 9px;font-size:12px}.iph{height:calc(100vh - 170px);min-height:560px;border-width:8px;border-radius:40px}}
+@media (max-width:520px){.seg{flex-wrap:nowrap}.seg button{padding:6px 9px;font-size:12px}.iphf{height:calc(100dvh - 150px);min-height:600px;padding:3px;border-radius:50px}.iphf>i{display:none}.iph{border-width:7px;border-radius:47px}.iph .ist{padding:6px 26px 0}}
+.mn{color:#027eb5;font-weight:500}
+.wm{flex:none;background:#fff;margin:0 10px;border-radius:14px;box-shadow:0 -2px 18px rgba(11,20,26,.12);max-height:240px;overflow-y:auto;padding:4px 0}
+.wm button{display:flex;gap:10px;align-items:center;width:100%;border:0;background:none;padding:8px 12px;text-align:left}
+.wm button:hover{background:#f5f6f6}
+.wm b{display:block;font-size:14.5px;font-weight:600}.wm small{display:block;font-size:12px;color:#667781}
 .set-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line2);gap:12px}
 .set-row:last-child{border-bottom:0}
 .set-row b{display:block;font-size:13.5px}.set-row span{font-size:12.5px;color:var(--ink2)}
@@ -309,6 +317,41 @@ td .cn{display:flex;align-items:center;gap:8px;font-weight:550}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .scrim{display:none}
 
+/* theme — light, minimal, pill buttons (ElevenLabs-inspired) */
+:root{--bg:#f7f7f6;--panel:#fff;--ink:#0a0a0a;--ink2:#5c5c5c;--ink3:#9b9b9b;--line:#e9e9e7;--line2:#f1f1ef;--brand:#0a0a0a;--brand2:#2b2b2b;--brand-soft:#f1f1ef;--r:20px;--shadow:none;--orb:radial-gradient(circle at 30% 25%,#ffd1a8 0,#ff8a65 30%,#a855f7 70%,#4f46e5 100%)}
+h1,h2,h3,.kpi .v,.bigtitle{font-family:"Inter Tight",Inter,system-ui,sans-serif}
+.side{background:#fff;color:#3d3d3d;border-right:1px solid var(--line);height:100vh;height:100dvh;overflow-y:auto;padding:20px 14px}
+.logo{color:var(--ink);font-family:"Inter Tight",Inter,sans-serif;font-weight:600;font-size:18px;letter-spacing:-.02em}
+.logo i{background:var(--orb);border-radius:50%}
+.ws{background:var(--line2);border-radius:14px}.ws b{color:var(--ink)}.ws span{color:var(--ink3)}
+.nav{color:#3d3d3d;border-radius:12px;font-weight:500;padding:10px 12px;transition:background .15s}
+.nav:hover{background:var(--line2);color:var(--ink)}
+.nav.on{background:#ececea;color:var(--ink)}
+.nav .pill{background:var(--ink);font-weight:500}
+.side .foot{color:var(--ink3)}
+.top{background:rgba(247,247,246,.82);border-bottom:1px solid transparent;padding:16px 32px}
+.top h1{font-size:22px;font-weight:500;letter-spacing:-.025em}
+.content{padding:24px 32px 90px}
+.btn{border-radius:99px;padding:9px 18px;font-weight:500;border-color:var(--line);transition:background .15s,transform .15s}
+.btn:hover{background:var(--line2)}
+.btn.pri{background:var(--ink);border-color:var(--ink)}
+.btn.pri:hover{background:#2b2b2b;transform:translateY(-1px)}
+.icon-btn{border-radius:99px}
+.card{border-radius:var(--r);border-color:var(--line)}
+.card-h{padding:16px 20px}.card-h h3{font-weight:500;font-size:15.5px;letter-spacing:-.01em}
+.card-b{padding:18px 20px}
+.kpi .v{font-weight:500;font-size:28px;letter-spacing:-.03em}
+.filters select{border-radius:99px;padding:8px 32px 8px 14px}
+.tabs,.seg{border-radius:99px}.tabs button,.seg button{border-radius:99px}
+.chip-f{background:var(--line2);color:var(--ink)}
+.bar i{background:linear-gradient(90deg,#1a1a1a,#6b6b6b)}
+.modal{border-radius:24px}
+.acc.on{background:var(--line2)}
+th{background:#fafaf9}tbody tr:hover td{background:#fafaf9}
+.content>*{animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+.content>*:nth-child(2){animation-delay:.05s}.content>*:nth-child(3){animation-delay:.1s}.content>*:nth-child(4){animation-delay:.15s}.content>*:nth-child(n+5){animation-delay:.2s}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.content>*,.iphf{animation:none}}
 @media (max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}}
 @media (max-width:900px){
   .app{grid-template-columns:1fr}
@@ -887,7 +930,6 @@ function viewAsk() {
 const PREVIEW = {three:{label:'3 times a day', times:['9:00 AM','2:00 PM','8:00 PM']}, two:{label:'Morning + evening', times:['9:00 AM','8:00 PM']}, evening:{label:'Evening only', times:['8:00 PM']}};
 const TEAM = [{n:'Riya', c:'#c2410c'}, {n:'Aman', c:'#0e7490'}, {n:'Neha', c:'#a21caf'}];
 const IC = {
-  bot:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="8" width="16" height="12" rx="4"/><path d="M12 4v4"/><circle cx="12" cy="3.5" r="1"/><circle cx="9" cy="14" r="1.2" fill="#fff"/><circle cx="15" cy="14" r="1.2" fill="#fff"/></svg>',
   grp:'<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 19c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6z"/><circle cx="17" cy="9" r="2.6" opacity=".7"/><path d="M15.5 13.2c3.4-.4 6 1.6 6 5.8h-4.4" opacity=".7"/></svg>',
   verified:'<svg width="16" height="16" viewBox="0 0 24 24"><path fill="#1d9bf0" d="M12 1.5l2.6 1.9 3.2-.2 1 3.1 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3.1-3.2-.2L12 22.5l-2.6-1.9-3.2.2-1-3.1-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3.1 3.2.2z"/><path d="M8 12.2l2.6 2.6L16 9.4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   ticks:'<svg width="16" height="11" viewBox="0 0 16 11" fill="none" stroke="#53bdeb" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6l3 3 6-7"/><path d="M6 9l1 1 6-8"/></svg>',
@@ -905,7 +947,7 @@ const IC = {
   comm:'<svg width="24" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="3"/><circle cx="5.5" cy="10" r="2.2"/><circle cx="18.5" cy="10" r="2.2"/><path d="M6.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5zM1 19c0-2.4 1.6-4 4-4 .8 0 1.5.2 2 .5A6.6 6.6 0 0 0 5 19zM23 19c0-2.4-1.6-4-4-4-.8 0-1.5.2-2 .5a6.6 6.6 0 0 1 2 3.5z"/></svg>',
   calls:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>'
 };
-const avatar = (c, sm) => c.bot&&!c.group ? `<div class="av bot ${sm?'sm':''}">${IC.bot}</div>` : c.group ? `<div class="av grp ${sm?'sm':''}">${IC.grp}</div>` : `<div class="av ${sm?'sm':''}" style="background:${c.color}">${c.name[0]}</div>`;
+const avatar = (c, sm) => c.bot&&!c.group ? `<div class="av bot ${sm?'sm':''}"><svg width="${sm?18:22}" height="${sm?18:22}" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l5-6 4 4 7-9"/></svg></div>` : c.group ? `<div class="av grp ${sm?'sm':''}">${IC.grp}</div>` : `<div class="av ${sm?'sm':''}" style="background:${c.color}">${c.name[0]}</div>`;
 const botName = () => CONFIG.storeName+' Bot';
 // people chats: canned history + random replies, so every chat in the list opens
 const WA_PEOPLE = [
@@ -917,9 +959,19 @@ const WA_PEOPLE = [
   {id:'family', name:'Family Group', group:1, time:'Sat', hist:[{who:'Papa', c:'#c2410c', t:'7:30 PM', x:'Sunday lunch at home'}, {who:'Mummy', c:'#047857', t:'7:42 PM', x:'Dinner at 8'}], replies:['Aa jaana time pe','Sab aa rahe hain','Ok beta']},
   {id:'neha', name:'Neha', color:'#7c4dbb', time:'Fri', hist:[{me:1, t:'1:15 PM', x:'Can you check the COD orders from yesterday?'}, {t:'1:20 PM', x:'Let me know once done.'}], replies:['On it','Checked, 4 are RTO','Will update the sheet']}
 ];
-let WA = {open:null, live:{}, read:{}, busy:null};
+let WA = {open:null, live:{}, read:{}, busy:null, typer:''};
+const TEAM_REPLIES = ['Noted, will check','Makes sense','On it','Agreed. Let us discuss at 6','Can you share the numbers here?','Will update by evening'];
+const waMembers = () => [{n:botName(), bot:1}, ...TEAM];
+const waMentions = q => esc(q).replace(new RegExp('@('+waMembers().map(m=>m.n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','g'), '<span class="mn">@$1</span>');
+function waMentionMenu() {
+  const box = $('waMention'), inp = $('waIn'); if (!box || !inp) return;
+  const m = inp.value.slice(0, inp.selectionStart).match(/@([^@]*)$/);
+  const list = m ? waMembers().filter(p=>p.n.toLowerCase().startsWith(m[1].toLowerCase())) : [];
+  box.hidden = !list.length;
+  box.innerHTML = list.map(p=>`<button type="button" data-act="waMention" data-n="${esc(p.n)}">${p.bot?avatar({bot:1},1):`<div class="av sm" style="background:${p.c}">${p.n[0]}</div>`}<span><b>${esc(p.n)}</b><small>${p.bot?'Bot · answers from your data':'Team member'}</small></span></button>`).join('');
+}
 const waOpts = {range:1,channel:'all',campaign:'all',device:'all',lp:'all'};
-const noEmoji = s => s.replace(/[\p{Extended_Pictographic}️‍]/gu,'').replace(/[ \t]+\n/g,'\n').replace(/[ \t]{2,}/g,' ');
+const noEmoji = s => s.replace(/[\p{Extended_Pictographic}️‍]/gu,'').replace(/[ \t]+\n/g,'\n').replace(/\n[ \t]+/g,'\n').replace(/[ \t]{2,}/g,' ');
 // Turn an answer() HTML reply into WhatsApp-style text: short lines, bold labels, no tables or emojis
 function waText(html) {
   const d = document.createElement('div'); d.innerHTML = html;
@@ -994,16 +1046,14 @@ function waAlert() {
 }
 // scheduled messages for the bot chat and the team group, following the preview schedule
 function waScripted(id) {
+  if (id==='team') return [{sys:`You added ${botName()}. Type @ to ask it anything.`},
+    {who:'Riya', t:'10:05 AM', h:'Festive sale creatives are live on Meta from today'},
+    {who:'Aman', t:'10:12 AM', h:'Nice. I moved 20% more budget to Google Search'},
+    {who:'Neha', t:'11:30 AM', h:'COD confirmation calls done for yesterday. 6 cancelled'},
+    {who:'Riya', t:'11:34 AM', h:'Ok. Let us check the numbers in the evening'}];
   const times = PREVIEW[state.wa.preview].times, m = [], bot = {bot:1};
-  if (id==='team') m.push({sys:`You added ${botName()}`});
   if (times.includes('9:00 AM')) m.push({...bot, t:'9:00 AM', h:waMorning()});
   const al = waAlert(); if (al) m.push({...bot, t:'11:42 AM', h:al});
-  if (id==='team') {
-    const g = groupBy(filterRows(waOpts,0,1), r=>r.ch).find(c=>c.key==='meta');
-    if (g && state.connected.shopify) { m.push({who:'Riya', t:'12:10 PM', h:`@${esc(botName())} Meta says how many orders yesterday vs Shopify?`});
-      m.push({...bot, t:'12:10 PM', h:`<b>Meta vs Shopify, yesterday</b>\n\nMeta reported: ${fmtN(g.claimed)} orders\nShopify confirmed: ${fmtN(g.orders)} orders\nOverclaim: +${pct(g.overclaim,0)}\n\n<b>True ROAS:</b> ${x2(g.roas)}\n<b>ROAS in Meta Ads Manager:</b> ${x2(g.platRoas)}`}); }
-    if (al) m.push({who:'Aman', t:'12:24 PM', h:'Pausing the weak ad set for today. Will swap the creatives tomorrow.'});
-  }
   if (times.includes('2:00 PM')) m.push({...bot, t:'2:00 PM', h:waMidday()});
   if (times.includes('8:00 PM')) m.push({...bot, t:'8:00 PM', h:waEvening()});
   return m;
@@ -1042,12 +1092,12 @@ function waBubble(m, prev) {
 }
 function waChat() {
   const c = waChats().find(x=>x.id===WA.open), ms = waMsgs(c), typing = WA.busy===c.id;
-  const sub = typing ? (c.group ? `${c.bot?botName():c.name} is typing...` : 'typing...') : c.id==='team' ? `You, ${TEAM.map(p=>p.n).join(', ')}, ${botName()}` : c.group ? 'tap here for group info' : c.bot ? 'Business account' : 'online';
-  const quick = c.bot ? ['What is today\'s ROAS?','Spend today','Which channel is overclaiming?','Anything wrong?','Summary of yesterday'] : [];
+  const sub = typing ? (c.group ? `${c.id==='team'?WA.typer:c.hist[0].who} is typing...` : 'typing...') : c.id==='team' ? `You, ${TEAM.map(p=>p.n).join(', ')}, ${botName()}` : c.group ? 'tap here for group info' : c.bot ? 'Business account' : 'online';
+  const quick = c.bot && !c.group ? ['What is today\'s ROAS?','Spend today','Which channel is overclaiming?','Anything wrong?','Summary of yesterday'] : [];
   return `<div class="wc-h"><button data-act="waBack" aria-label="Back">${IC.back}</button>${avatar(c,1)}<div class="who"><b>${esc(c.name)}${c.verified?IC.verified:''}</b><span>${esc(sub)}</span></div><div class="r"><button data-act="waLocked" aria-label="Video call">${IC.video}</button><button data-act="waLocked" aria-label="Call">${IC.call}</button></div></div>
-    <div class="wc-b" id="waBody"><div class="wd">Today</div>${c.bot?`<div class="wn">Demo data. Numbers come from your connected sources.</div>`:''}${ms.map((m,i)=>waBubble(m, ms[i-1])).join('')}${typing?`<div class="wb"><span class="typing"><i></i><i></i><i></i></span></div>`:''}</div>
+    <div class="wc-b" id="waBody"><div class="wd">Today</div>${c.bot&&!c.group?`<div class="wn">Demo data. Numbers come from your connected sources.</div>`:''}${ms.map((m,i)=>waBubble(m, ms[i-1])).join('')}${typing?`<div class="wb"><span class="typing"><i></i><i></i><i></i></span></div>`:''}</div>
     ${quick.length?`<div class="wq">${quick.map(q=>`<button data-act="waQuick" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`:''}
-    <form class="wc-in" id="waForm" autocomplete="off"><input id="waIn" placeholder="${c.bot?'Ask anything, e.g. aaj ka spend?':'Message'}"><button type="submit" aria-label="Send">${IC.send}</button></form>`;
+    ${c.id==='team'?'<div class="wm" id="waMention" hidden></div>':''}<form class="wc-in" id="waForm" autocomplete="off"><input id="waIn" placeholder="${c.id==='team'?'Message. Type @ to ask the bot':c.bot?'Ask anything, e.g. aaj ka spend?':'Message'}"><button type="submit" aria-label="Send">${IC.send}</button></form>`;
 }
 function waDraw(scroll) {
   const s = $('waScreen'); if (!s) return;
@@ -1057,7 +1107,18 @@ function waDraw(scroll) {
 function waSend(q) {
   q = q.trim(); const id = WA.open; if (!q || !id || WA.busy) return;
   const c = waChats().find(x=>x.id===id), t = new Date().toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'}).toUpperCase();
-  (WA.live[id] ||= []).push({me:1, t, h:esc(q)}); WA.busy = id; waDraw();
+  const pick = a => a[Math.floor(Math.random()*a.length)];
+  (WA.live[id] ||= []).push({me:1, t, h:waMentions(q)});
+  if (id==='team') {
+    const toBot = q.includes('@'+botName()), mate = TEAM.find(p=>q.includes('@'+p.n)) || (!toBot && pick(TEAM));
+    WA.busy = id; WA.typer = toBot ? botName() : mate.n; waDraw();
+    setTimeout(() => {
+      WA.live[id].push(toBot ? {bot:1, src:1, t, h:waReply(q.replace('@'+botName(),'').trim() || 'summary')} : {who:mate.n, t, h:esc(pick(TEAM_REPLIES))});
+      WA.busy = null; if (WA.open===id) waDraw();
+    }, toBot ? 1100 : 1400 + Math.random()*900);
+    return;
+  }
+  WA.busy = id; waDraw();
   setTimeout(() => {
     const m = c.bot ? {bot:1, src:1, t, h:waReply(q)} : c.group ? {who:c.hist[0].who, c:c.hist[0].c, t, h:esc(c.replies[Math.floor(Math.random()*c.replies.length)])} : {t, h:esc(c.replies[Math.floor(Math.random()*c.replies.length)])};
     WA.live[id].push(m); WA.busy = null; if (WA.open===id) waDraw();
@@ -1068,8 +1129,8 @@ function viewWhatsApp() {
   const p = state.wa.preview;
   return `<div class="wa-page">
     <div class="wa-prev"><span class="lbl">Preview how often the bot posts</span><div class="seg">${Object.entries(PREVIEW).map(([k,o])=>`<button class="${p===k?'on':''}" data-act="waPreview" data-k="${k}">${o.label}</button>`).join('')}</div></div>
-    <div class="iph"><div class="isl"></div><div class="ist"><span>9:41</span><span class="ic"><svg width="18" height="12" viewBox="0 0 18 12" fill="#111"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="#111"><path d="M8 12l2.6-3.2a4 4 0 0 0-5.2 0zM3.6 6.6a7 7 0 0 1 8.8 0l1.6-2a9.6 9.6 0 0 0-12 0zM.5 2.8a12 12 0 0 1 15 0L16 2.2A13 13 0 0 0 0 2.2z"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="#111" opacity=".4"/><rect x="2" y="2" width="19" height="8" rx="1.8" fill="#111"/><rect x="24" y="4" width="1.6" height="4" rx=".8" fill="#111" opacity=".4"/></svg></span></div>
-      <div id="waScreen"></div><div class="home"></div></div>
+    <div class="iphf"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><div class="iph"><div class="isl"></div><div class="ist"><span>9:41</span><span class="ic"><svg width="18" height="12" viewBox="0 0 18 12" fill="#111"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="#111"><path d="M8 12l2.6-3.2a4 4 0 0 0-5.2 0zM3.6 6.6a7 7 0 0 1 8.8 0l1.6-2a9.6 9.6 0 0 0-12 0zM.5 2.8a12 12 0 0 1 15 0L16 2.2A13 13 0 0 0 0 2.2z"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="#111" opacity=".4"/><rect x="2" y="2" width="19" height="8" rx="1.8" fill="#111"/><rect x="24" y="4" width="1.6" height="4" rx=".8" fill="#111" opacity=".4"/></svg></span></div>
+      <div id="waScreen"></div><div class="home"></div></div></div>
   </div>`;
 }
 
@@ -1461,6 +1522,8 @@ document.addEventListener('click', e => {
     case 'waOpen': WA.open = a.dataset.id; WA.read[a.dataset.id] = 1; waDraw(); break;
     case 'waBack': WA.open = null; waDraw(); break;
     case 'waQuick': waSend(a.dataset.q); break;
+    case 'waMention': { const inp = $('waIn'), pos = inp.selectionStart, before = inp.value.slice(0,pos).replace(/@[^@]*$/, '@'+a.dataset.n+' ');
+      inp.value = before + inp.value.slice(pos); inp.focus(); inp.setSelectionRange(before.length, before.length); waMentionMenu(); break; }
     case 'waLocked': toast('Only Chats works in this demo'); break;
     case 'saveSettings': {
       const n = $('setName').value.trim(); const be = parseFloat($('setBe').value);
@@ -1472,6 +1535,7 @@ document.addEventListener('click', e => {
       state = DEFAULT_STATE(); CONFIG.storeName = 'Kesar Lane'; $('drawer').classList.remove('on'); render(); toast('Workspace reset'); break;
   }
 });
+document.addEventListener('input', e => { if (e.target.id==='waIn') waMentionMenu(); });
 document.addEventListener('submit', e => { if (e.target.id==='waForm') { e.preventDefault(); waSend($('waIn').value); } });
 document.addEventListener('change', e => {
   const s = e.target.closest('[data-filter]'); if (!s) return;
