@@ -1,5 +1,7 @@
 # ClickTrail — demo dashboard
 
+**ClickTrail** shows e-commerce founders what really happens after someone clicks an ad. It checks what Google and Meta claim against the orders Shopify actually records, finds where shoppers drop off between the click and the order, and posts plain-language updates and alerts in the team's WhatsApp group.
+
 A clickable demo of a post-click reporting product for e-commerce founders. It's one file (`index.html`) with no build step, no backend and no API keys. Every number is dummy data generated in the browser. No real Google, Meta, Shopify or GA4 account is ever contacted.
 
 ## Make it live (pick one, ~2 minutes)

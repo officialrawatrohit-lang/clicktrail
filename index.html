@@ -198,8 +198,6 @@ td .cn{display:flex;align-items:center;gap:8px;font-weight:550}
 .center{text-align:center}
 
 /* chat */
-.fab{position:fixed;right:22px;bottom:22px;z-index:40;background:var(--ink);color:#fff;border:0;border-radius:99px;padding:12px 18px;display:flex;gap:8px;align-items:center;font-weight:600;box-shadow:0 10px 30px rgba(15,23,42,.3);cursor:pointer}
-.fab:hover{background:#1e293b}
 .drawer{position:fixed;top:0;right:0;bottom:0;width:440px;max-width:100%;background:#fff;border-left:1px solid var(--line);z-index:60;transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.08)}
 .drawer{visibility:hidden}
 .drawer.on{transform:none;visibility:visible}
@@ -237,47 +235,76 @@ td .cn{display:flex;align-items:center;gap:8px;font-weight:550}
 .ask-hero h2{margin:8px 0 4px;font-size:19px}
 .ask-hero p{margin:0;color:var(--ink2);font-size:13px}
 
-/* whatsapp */
-.phone{width:320px;max-width:100%;margin:0 auto;border-radius:34px;border:10px solid #111827;background:#efeae2;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.18)}
-.phone .ph{background:var(--wa-dark);color:#fff;padding:12px 14px;display:flex;gap:10px;align-items:center}
-.phone .ph b{display:block;font-size:14px}.phone .ph span{font-size:11.5px;opacity:.8}
-.phone .pb{padding:12px;min-height:430px;display:flex;flex-direction:column;gap:8px;background:#efeae2}
-.wa{background:#fff;border-radius:9px;padding:8px 10px;font-size:12.5px;max-width:92%;box-shadow:0 1px 1px rgba(0,0,0,.08);white-space:pre-wrap;line-height:1.4}
-.wa.me{background:#d9fdd3;align-self:flex-end}
-.wa .tm{display:block;text-align:right;font-size:10.5px;color:#667781;margin-top:3px}
+/* whatsapp bot — phone mockup */
+.wa-page{display:flex;flex-direction:column;align-items:center;gap:16px;padding-bottom:10px}
+.wa-prev{display:flex;flex-direction:column;align-items:center;gap:8px}
+.wa-prev .lbl{font-size:12.5px;color:var(--ink2)}
+.seg{display:inline-flex;background:#e9ebef;border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap;justify-content:center}
+.seg button{border:0;background:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;color:var(--ink2);cursor:pointer}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.iph{width:380px;max-width:100%;height:min(780px,calc(100vh - 170px));min-height:620px;border:12px solid #111;border-radius:54px;background:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(15,23,42,.22);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,"Segoe UI",Roboto,sans-serif;color:#111b21}
+.iph .isl{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:112px;height:32px;background:#000;border-radius:20px;z-index:5}
+.iph .ist{height:50px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:6px 30px 0;font-weight:600;font-size:15px;background:#fff}
+.iph .ist .ic{display:flex;gap:5px;align-items:center}
+.iph .home{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:130px;height:5px;border-radius:9px;background:#111;z-index:5}
+#waScreen{flex:1;min-height:0;display:flex;flex-direction:column}
+.iph button{font-family:inherit;cursor:pointer}
+/* chat list */
+.wl-h{display:flex;align-items:center;padding:6px 16px 8px}
+.wl-h b{font-size:26px;color:#1daa61;font-weight:700;letter-spacing:-.3px}
+.wl-h .r{margin-left:auto;display:flex;gap:18px;color:#111b21}
+.wl-h .r button,.wc-h button{border:0;background:none;padding:2px;color:inherit;display:grid;place-items:center}
+.wl-s{margin:2px 14px 10px;background:#f0f2f5;border-radius:22px;padding:10px 14px;display:flex;gap:10px;align-items:center;color:#667781;font-size:15px}
+.wl-c{display:flex;gap:7px;padding:0 14px 8px;overflow-x:auto;scrollbar-width:none}
+.wl-c button{border:1px solid #e3e6e8;background:#fff;border-radius:18px;padding:5px 13px;font-size:13.5px;color:#54656f;white-space:nowrap}
+.wl-c button.on{background:#d8fdd2;border-color:#d8fdd2;color:#15603e;font-weight:600}
+.wl-list{flex:1;min-height:0;overflow-y:auto}
+.wl-row{display:flex;gap:12px;align-items:center;padding:9px 14px;cursor:pointer;width:100%;border:0;background:#fff;text-align:left}
+.wl-row:hover{background:#f5f6f6}
+.wl-row .tx{flex:1;min-width:0;border-bottom:1px solid #eef0f1;padding-bottom:10px;margin-bottom:-10px}
+.wl-row .l1,.wl-row .l2{display:flex;align-items:center;gap:6px}
+.wl-row .nm{font-weight:600;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wl-row .tm{margin-left:auto;font-size:12px;color:#667781;flex:none}
+.wl-row .tm.new{color:#1daa61;font-weight:600}
+.wl-row .pv{font-size:14px;color:#667781;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.wl-row .badge{background:#1daa61;color:#fff;font-size:11.5px;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:grid;place-items:center;padding:0 6px;flex:none}
+.wl-row .mt{color:#8696a0;flex:none;display:flex}
+.av{width:48px;height:48px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;font-weight:600;font-size:17px}
+.av.sm{width:38px;height:38px;font-size:14px}
+.av.bot{background:#1f2c4c}.av.grp{background:#dfe5e7;color:#8696a0}
+.vf{flex:none;display:flex}
+.wl-nav{flex:none;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #eef0f1;padding:8px 4px 22px;background:#fff}
+.wl-nav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;font-weight:600;color:#111b21}
+.wl-nav button i{display:grid;place-items:center;width:56px;height:30px;border-radius:15px}
+.wl-nav button.on i{background:#d8fdd2;color:#15603e}
+.wl-nav button.lk{opacity:.4}
+/* chat screen */
+.wc-h{flex:none;display:flex;align-items:center;gap:8px;padding:6px 12px 8px 6px;border-bottom:1px solid #eef0f1;background:#fff}
+.wc-h .who{flex:1;min-width:0;line-height:1.2}
+.wc-h .who b{display:flex;align-items:center;gap:4px;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wc-h .who span{display:block;font-size:12.5px;color:#667781;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wc-h .r{display:flex;gap:16px;color:#111b21}
+.wc-b{flex:1;min-height:0;overflow-y:auto;background:#efeae2;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
+.wd{align-self:center;background:#fff;border-radius:8px;padding:4px 10px;font-size:12px;color:#54656f;margin:6px 0;box-shadow:0 1px .5px rgba(11,20,26,.1)}
+.wn{align-self:center;background:#ffeecd;border-radius:8px;padding:5px 10px;font-size:12px;color:#54656f;text-align:center;margin:2px 10px 6px;max-width:90%}
+.wb{align-self:flex-start;background:#fff;border-radius:8px;padding:6px 8px 4px 9px;font-size:14.2px;line-height:1.38;max-width:84%;white-space:pre-wrap;overflow-wrap:anywhere;box-shadow:0 1px .5px rgba(11,20,26,.13);margin-top:5px}
+.wb.me{align-self:flex-end;background:#d9fdd3}
+.wb.cont{margin-top:1px}
+.wb .sn{display:block;font-size:12.5px;font-weight:600;margin-bottom:1px}
+.wb .ft{float:right;display:inline-flex;gap:3px;align-items:center;font-size:11px;color:#667781;margin:8px 0 -3px 10px;white-space:nowrap}
+.wb .src{display:block;margin-top:6px;padding-top:5px;border-top:1px solid #eef0f1;font-size:11.5px;color:#8696a0}
+.wq{flex:none;display:flex;gap:6px;overflow-x:auto;padding:7px 10px 0;background:#efeae2;scrollbar-width:none}
+.wq button{flex:none;border:0;background:#fff;color:#027eb5;border-radius:16px;padding:6px 12px;font-size:13px;box-shadow:0 1px .5px rgba(11,20,26,.13)}
+.wc-in{flex:none;display:flex;gap:6px;align-items:center;padding:7px 8px 24px;background:#efeae2}
+.wc-in input{flex:1;min-width:0;border:0;border-radius:22px;padding:11px 16px;font-size:15px;background:#fff;outline:none;font-family:inherit}
+.wc-in button{flex:none;width:44px;height:44px;border-radius:50%;border:0;background:#1daa61;color:#fff;display:grid;place-items:center}
+@media (max-width:520px){.seg{flex-wrap:nowrap}.seg button{padding:6px 9px;font-size:12px}.iph{height:calc(100vh - 170px);min-height:560px;border-width:8px;border-radius:40px}}
 .set-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line2);gap:12px}
 .set-row:last-child{border-bottom:0}
 .set-row b{display:block;font-size:13.5px}.set-row span{font-size:12.5px;color:var(--ink2)}
 .tog{width:38px;height:22px;border-radius:99px;background:var(--line);position:relative;cursor:pointer;border:0;flex:none;transition:background .15s}
 .tog::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
 .tog.on{background:var(--good)}.tog.on::after{left:18px}
-
-.src{margin-top:8px;font-size:11px;color:var(--ink3);border-top:1px dashed var(--line);padding-top:6px}
-.wa .src{border-color:#e5e7eb}
-.wa table{font-size:11px;border-collapse:collapse;margin:4px 0;width:100%}
-.wa th,.wa td{padding:3px 4px;border-bottom:1px solid #eee;text-align:right;white-space:nowrap;background:none}
-.wa th:first-child,.wa td:first-child{text-align:left}
-.wa ul,.wa ol{margin:2px 0;padding-left:16px}.wa p{margin:0 0 4px}
-.wa .act{margin-top:4px;font-size:11.5px;background:#f6f6f6;border-radius:6px;padding:5px 7px}
-.wa .who{display:block;font-size:11.5px;font-weight:700;margin-bottom:2px}
-.wa .tw{overflow-x:auto}
-.wa-day{align-self:center;background:#fff;border-radius:7px;padding:3px 10px;font-size:11px;color:#54656f;box-shadow:0 1px 1px rgba(0,0,0,.06)}
-.wa-sys{align-self:center;background:#fff7d6;border-radius:7px;padding:4px 10px;font-size:11px;color:#54656f;text-align:center}
-.phone .pb{max-height:600px;overflow-y:auto}
-.wa-in{display:flex;gap:6px;padding:8px;background:#f0f2f5}
-.wa-in input{flex:1;border:0;border-radius:20px;padding:9px 12px;font-size:13px;min-width:0}
-.wa-in button{border:0;background:var(--wa-dark);color:#fff;border-radius:50%;width:38px;height:38px;cursor:pointer;flex:none}
-.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;margin-bottom:8px}
-.opt.on{border-color:var(--brand);background:var(--brand-soft)}
-.opt input{margin-top:3px;accent-color:var(--brand)}
-.opt b{display:block;font-size:13.5px}.opt span{font-size:12.5px;color:var(--ink2)}
-.ths{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 10px}
-.ths label{font-size:12px;color:var(--ink2);display:flex;flex-direction:column;gap:4px}
-.ths input{border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
-.alist{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-direction:column;gap:6px;font-size:12.5px}
-.alist li{display:flex;gap:8px;align-items:baseline}
-.alist .when{color:var(--ink3);font-size:11.5px;min-width:64px}
-.bigcount{font-size:26px;font-weight:700}
 .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:#0f172a;color:#fff;padding:10px 16px;border-radius:10px;font-size:13.5px;opacity:0;transition:all .2s;z-index:200;pointer-events:none;max-width:90vw}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .scrim{display:none}
@@ -299,7 +326,7 @@ td .cn{display:flex;align-items:center;gap:8px;font-weight:550}
   .filters label{flex:1 1 140px}
   .ask-page{height:calc(100vh - 130px)}
 }
-@media (max-width:520px){.g4{grid-template-columns:1fr 1fr}.kpi .v{font-size:18px}.fab span{display:none}.fab{padding:13px}}
+@media (max-width:520px){.g4{grid-template-columns:1fr 1fr}.kpi .v{font-size:18px}}
 </style>
 </head>
 <body>
@@ -309,7 +336,7 @@ td .cn{display:flex;align-items:center;gap:8px;font-weight:550}
     <div class="ws"><b id="wsName">Store</b><span id="wsDomain"></span></div>
     <button class="nav" data-act="go" data-view="report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 6-6"/></svg>Post-click report</button>
     <button class="nav" data-act="go" data-view="ask"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>Ask AI<span class="pill">New</span></button>
-    <button class="nav" data-act="go" data-view="whatsapp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 1-13.5 7.8L3 21l1.2-4.5A9 9 0 1 1 21 12z"/></svg>WhatsApp reports</button>
+    <button class="nav" data-act="go" data-view="whatsapp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 1-13.5 7.8L3 21l1.2-4.5A9 9 0 1 1 21 12z"/></svg>WhatsApp bot</button>
     <button class="nav" data-act="go" data-view="integrations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 7V3M15 7V3M7 7h10v4a5 5 0 0 1-10 0z"/><path d="M12 16v5"/></svg>Integrations<span class="pill" id="intPill">0/4</span></button>
     <button class="nav" data-act="go" data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button>
     <div class="foot" id="footNote">Read-only access · Data refreshes hourly</div>
@@ -324,8 +351,6 @@ td .cn{display:flex;align-items:center;gap:8px;font-weight:550}
     <div class="content" id="view"></div>
   </main>
 </div>
-
-<button class="fab" id="fab" data-act="openChat"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/></svg><span>Ask AI about your report</span></button>
 
 <aside class="drawer" id="drawer">
   <div class="dh">
@@ -462,12 +487,13 @@ const BENCH_PEERS = {roas:3.2, cvr:.016, landRate:.85, aov:1850, cpo:560, coRate
    STATE
    ========================================================= */
 const KEY = 'clicktrail_demo_v1';
-const DEFAULT_STATE = () => ({view:'integrations', connected:{}, accounts:{}, filters:{range:30,channel:'all',campaign:'all',device:'all',lp:'all'}, trend:'rev', sort:{key:'spend',dir:-1}, chat:[], wa:{freq:'auto', mode:'learn', th:{roas:2, spend:40, gap:30}, weekly:true}, syncedAt:Date.now()});
+const DEFAULT_STATE = () => ({view:'integrations', connected:{}, accounts:{}, filters:{range:30,channel:'all',campaign:'all',device:'all',lp:'all'}, trend:'rev', sort:{key:'spend',dir:-1}, chat:[], wa:{preview:'two', mode:'learn', th:{roas:2, spend:40, gap:30}}, syncedAt:Date.now()});
 let state;
 try { state = JSON.parse(localStorage.getItem(KEY)) || DEFAULT_STATE(); } catch(e) { state = DEFAULT_STATE(); }
 if (location.search.includes('reset')) { state = DEFAULT_STATE(); history.replaceState(null,'',location.pathname); }
 if (state.storeName) CONFIG.storeName = state.storeName;
-state.wa = Object.assign({freq:'auto', mode:'learn', th:{roas:2, spend:40, gap:30}, weekly:true}, state.wa||{});
+state.wa = Object.assign({preview:'two', mode:'learn', th:{roas:2, spend:40, gap:30}}, state.wa||{});
+if (!['three','two','evening'].includes(state.wa.preview)) state.wa.preview = 'two';
 if (!state.wa.th) state.wa.th = {roas:2, spend:40, gap:30};
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
 
@@ -640,7 +666,7 @@ function bindCharts() {
 /* =========================================================
    VIEWS
    ========================================================= */
-const TITLES = {report:'Post-click report', ask:'Ask AI', whatsapp:'WhatsApp reports', integrations:'Integrations', settings:'Settings'};
+const TITLES = {report:'Post-click report', ask:'Ask AI', whatsapp:'WhatsApp bot', integrations:'Integrations', settings:'Settings'};
 
 function render() {
   $('chatHolder').appendChild($('chat'));
@@ -655,9 +681,9 @@ function render() {
   const html = {report:viewReport, ask:viewAsk, whatsapp:viewWhatsApp, integrations:viewIntegrations, settings:viewSettings}[v]();
   $('view').innerHTML = html;
   bindCharts();
+  if (v==='whatsapp') waDraw();
   if (v==='ask') $('askMount').appendChild($('chat'));
   else if ($('drawer').classList.contains('on')) $('drawerBody').appendChild($('chat'));
-  $('fab').style.display = (v==='ask' || !adChans().length || $('drawer').classList.contains('on')) ? 'none' : 'flex';
   renderChatMeta();
   save();
 }
@@ -857,94 +883,195 @@ function viewAsk() {
   return `<div class="card ask-page" id="askMount"></div>`;
 }
 
-/* ---------- WhatsApp ---------- */
-const GROUP = {name:()=>CONFIG.storeName+' · Growth team', members:['You (Founder)','Riya — Marketing','Aman — Performance','Neha — Ops']};
-const FREQ = {
-  auto:   {label:'Auto — based on daily spend', desc:'Above ₹50k/day: 3 times a day. Below: morning + evening. Alerts any time.'},
-  three:  {label:'3 times a day', desc:'9:00 AM recap · 2:00 PM check · 8:00 PM day close', times:['9:00 AM','2:00 PM','8:00 PM']},
-  two:    {label:'Morning + evening', desc:'9:00 AM recap · 8:00 PM day close', times:['9:00 AM','8:00 PM']},
-  evening:{label:'Evening only', desc:'8:00 PM day close', times:['8:00 PM']}
+/* ---------- WhatsApp bot (phone mockup) ---------- */
+const PREVIEW = {three:{label:'3 times a day', times:['9:00 AM','2:00 PM','8:00 PM']}, two:{label:'Morning + evening', times:['9:00 AM','8:00 PM']}, evening:{label:'Evening only', times:['8:00 PM']}};
+const TEAM = [{n:'Riya', c:'#c2410c'}, {n:'Aman', c:'#0e7490'}, {n:'Neha', c:'#a21caf'}];
+const IC = {
+  bot:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="8" width="16" height="12" rx="4"/><path d="M12 4v4"/><circle cx="12" cy="3.5" r="1"/><circle cx="9" cy="14" r="1.2" fill="#fff"/><circle cx="15" cy="14" r="1.2" fill="#fff"/></svg>',
+  grp:'<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 19c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6z"/><circle cx="17" cy="9" r="2.6" opacity=".7"/><path d="M15.5 13.2c3.4-.4 6 1.6 6 5.8h-4.4" opacity=".7"/></svg>',
+  verified:'<svg width="16" height="16" viewBox="0 0 24 24"><path fill="#1d9bf0" d="M12 1.5l2.6 1.9 3.2-.2 1 3.1 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3.1-3.2-.2L12 22.5l-2.6-1.9-3.2.2-1-3.1-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3.1 3.2.2z"/><path d="M8 12.2l2.6 2.6L16 9.4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  ticks:'<svg width="16" height="11" viewBox="0 0 16 11" fill="none" stroke="#53bdeb" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6l3 3 6-7"/><path d="M6 9l1 1 6-8"/></svg>',
+  mute:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>',
+  pin:'<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M16 3l5 5-3 1-4 4 1 5-2 1-4-4-5 5-1-1 5-5-4-4 1-2 5 1 4-4z"/></svg>',
+  back:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  send:'<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M3 20.5l18-8.5L3 3.5l2.2 7L15 12l-9.8 1.5z"/></svg>',
+  search:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
+  cam:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+  dots:'<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>',
+  video:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/></svg>',
+  call:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>',
+  chats:'<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H8l-4 3.5V5a1 1 0 0 1 1-1z"/><path d="M8 9h8M8 12.5h5" stroke="#d8fdd2" stroke-width="1.6" stroke-linecap="round"/></svg>',
+  updates:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="8.5" stroke-dasharray="4 2.2"/><circle cx="12" cy="12" r="4.5"/></svg>',
+  comm:'<svg width="24" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="3"/><circle cx="5.5" cy="10" r="2.2"/><circle cx="18.5" cy="10" r="2.2"/><path d="M6.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5zM1 19c0-2.4 1.6-4 4-4 .8 0 1.5.2 2 .5A6.6 6.6 0 0 0 5 19zM23 19c0-2.4-1.6-4-4-4-.8 0-1.5.2-2 .5a6.6 6.6 0 0 1 2 3.5z"/></svg>',
+  calls:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>'
 };
-const avgDailySpend = () => agg(filterRows({range:7,channel:'all',campaign:'all',device:'all',lp:'all'},0,7)).spend/7;
-function scheduleTimes() { const k = state.wa.freq; if (k!=='auto') return FREQ[k].times; return avgDailySpend() > 50000 ? FREQ.three.times : FREQ.two.times; }
-let waLive = [], waBusy = false;
-const waFmt = s => esc(s).replace(/\*(.+?)\*/g,'<b>$1</b>');
-function waMessage() {
-  const f = {range:1,channel:'all',campaign:'all',device:'all',lp:'all'};
-  const rows = filterRows(f,0,1), A = agg(rows), P = agg(filterRows(f,1,1)), oth = otherAgg(1);
-  const L = leakOf(A), ch = groupBy(rows, r=>r.ch).sort((a,b)=>b.spend-a.spend);
-  const lps = groupBy(rows, r=>r.lp).filter(x=>x.clicks>A.clicks*.05).sort((a,b)=>a.landRate-b.landRate);
-  const shop = state.connected.shopify;
-  const gapCh = ch.slice().sort((a,b)=>b.overclaim-a.overclaim)[0];
-  const arrow = (c,p) => c>=p ? '▲' : '▼';
-  return `*Good morning ☀️ Yesterday at ${CONFIG.storeName}*
-
-💰 Total ad spend: *${fmtINR(A.spend)}* (${ch.map(c=>`${c.key==='google'?'Google':'Meta'} ${fmtINR(c.spend)}`).join(' · ')})
-🛍️ ${shop?'Shopify sales':'Sales from ads'}: *${fmtINR(shop?A.revenue+oth.revenue:A.revenue)}* · ${fmtN(shop?A.orders+oth.orders:A.orders)} orders
-📈 True ROAS: *${x2(A.roas)}* ${arrow(A.roas,P.roas)} ${Math.abs((A.roas-P.roas)/P.roas*100).toFixed(0)}%
-${ch.map(c=>`• ${chName(c.key)}: ${fmtN(c.orders)} orders · ${x2(c.roas)}`).join('\n')}
-${shop&&gapCh?`\n🔍 ${chName(gapCh.key)} claims ${fmtN(gapCh.claimed)} orders, Shopify confirms ${fmtN(gapCh.orders)} (+${pct(gapCh.overclaim,0)})`:''}
-⚠️ ${L?cap(L.bad(L.rate)):''}${lps[0]?` — worst: ${LPS[lps[0].key].name} (${LPS[lps[0].key].load}s load)`:''}
-
-Ask me anything in this group 👇`;
+const avatar = (c, sm) => c.bot&&!c.group ? `<div class="av bot ${sm?'sm':''}">${IC.bot}</div>` : c.group ? `<div class="av grp ${sm?'sm':''}">${IC.grp}</div>` : `<div class="av ${sm?'sm':''}" style="background:${c.color}">${c.name[0]}</div>`;
+const botName = () => CONFIG.storeName+' Bot';
+// people chats: canned history + random replies, so every chat in the list opens
+const WA_PEOPLE = [
+  {id:'mohan', name:'Mohan', color:'#4f7a5a', time:'8:15 AM', unread:2, hist:[{t:'8:12 AM', x:'Kal ka plan pakka?'}, {t:'8:15 AM', x:'Bhai kal milte hain?'}], replies:['Done, 11 baje milte hain','Theek hai, location bhej dena','Haan pakka','Call karta hoon thodi der mein']},
+  {id:'shyam', name:'Shyam', color:'#8a5a3c', time:'Yesterday', unread:1, hist:[{me:1, t:'6:40 PM', x:'Invoice bhej diya hai'}, {t:'7:05 PM', x:'Payment ho gaya'}], replies:['Receipt mil gayi?','Ok, next order Monday ko','Thik hai bhai']},
+  {id:'office', name:'Office Team', group:1, time:'Yesterday', muted:1, hist:[{who:'Rohit', c:'#0e7490', t:'5:20 PM', x:'Meeting at 11 AM tomorrow'}, {who:'Sana', c:'#a21caf', t:'5:24 PM', x:'Noted'}], replies:['Noted','Will be there','Can we move it to 11:30?']},
+  {id:'pooja', name:'Pooja', color:'#b4536b', time:'Mon', hist:[{me:1, t:'4:10 PM', x:'Sending the new lookbook tonight'}, {t:'4:12 PM', x:'Okay, got it'}], replies:['Looks great','Will check and revert','Sure']},
+  {id:'amit', name:'Amit (Client)', color:'#3d5a99', time:'Sun', unread:3, hist:[{t:'3:02 PM', x:'Got the samples'}, {t:'3:05 PM', x:'Quality looks good'}, {t:'3:06 PM', x:'Can we connect at 5 PM?'}], replies:['Perfect, talk at 5','Sharing the PO shortly','Thanks, will confirm by evening']},
+  {id:'family', name:'Family Group', group:1, time:'Sat', hist:[{who:'Papa', c:'#c2410c', t:'7:30 PM', x:'Sunday lunch at home'}, {who:'Mummy', c:'#047857', t:'7:42 PM', x:'Dinner at 8'}], replies:['Aa jaana time pe','Sab aa rahe hain','Ok beta']},
+  {id:'neha', name:'Neha', color:'#7c4dbb', time:'Fri', hist:[{me:1, t:'1:15 PM', x:'Can you check the COD orders from yesterday?'}, {t:'1:20 PM', x:'Let me know once done.'}], replies:['On it','Checked, 4 are RTO','Will update the sheet']}
+];
+let WA = {open:null, live:{}, read:{}, busy:null};
+const waOpts = {range:1,channel:'all',campaign:'all',device:'all',lp:'all'};
+const noEmoji = s => s.replace(/[\p{Extended_Pictographic}️‍]/gu,'').replace(/[ \t]+\n/g,'\n').replace(/[ \t]{2,}/g,' ');
+// Turn an answer() HTML reply into WhatsApp-style text: short lines, bold labels, no tables or emojis
+function waText(html) {
+  const d = document.createElement('div'); d.innerHTML = html;
+  const inline = n => n.nodeType===3 ? esc(n.textContent.replace(/\s+/g,' ')) : n.nodeType!==1 ? '' : (n.tagName==='B'||n.tagName==='STRONG') ? `<b>${[...n.childNodes].map(inline).join('')}</b>` : [...n.childNodes].map(inline).join('');
+  const out = [];
+  for (const n of d.childNodes) {
+    if (n.nodeType===3) { const t = n.textContent.trim(); if (t) out.push(esc(t)); continue; }
+    if (n.nodeType!==1 || n.classList.contains('src')) continue;
+    const tb = n.tagName==='TABLE' ? n : n.querySelector('table');
+    if (tb) {
+      const heads = [...tb.querySelectorAll('thead th')].map(th=>th.textContent.trim());
+      out.push([...tb.querySelectorAll('tbody tr')].map(tr => { const c = [...tr.children].map(td=>inline(td).trim());
+        return `<b>${esc(tr.children[0].textContent.trim())}</b>\n` + c.slice(1).map((v,i)=>heads[i+1] ? `${heads[i+1]}: ${v}` : v).join('\n'); }).join('\n\n'));
+    } else if (n.tagName==='UL' || n.tagName==='OL') out.push([...n.children].map((li,i)=>(n.tagName==='OL'?`${i+1}. `:'- ')+inline(li).trim()).join('\n'));
+    else if (n.classList.contains('act')) out.push('<b>What to do</b>\n'+inline(n).trim());
+    else out.push(inline(n).trim());
+  }
+  return noEmoji(out.filter(Boolean).join('\n\n')).trim();
 }
-function waAfternoon() {
-  const A = agg(filterRows({range:0,channel:'all',campaign:'all',device:'all',lp:'all'},0,0));
-  return `*2 PM check*\nSpend so far ₹${fmtN(A.spend/FRAC*0.58)} · ${fmtN(A.orders/FRAC*0.55)} orders. On track vs a normal day. Nothing else to flag.`;
+function waReply(q) {
+  const keep = state.filters; state.filters = {range:7,channel:'all',campaign:'all',device:'all',lp:'all'};
+  try { return waText(answer(q)); } catch(e) { return 'Sorry, I could not read that. Try asking another way.'; } finally { state.filters = keep; }
+}
+const waSrc = () => { const s = []; if (state.connected.shopify) s.push('Shopify'); if (state.connected.google) s.push('Google Ads'); if (state.connected.meta) s.push('Meta Ads'); if (state.connected.ga4) s.push('GA4'); return `<span class="src">Source: ${s.join(', ')}</span>`; };
+// scale today's partial numbers to a given hour of the day
+function dayAt(h) { const A = agg(filterRows({...waOpts,range:0},0,0)), k = (h/24)/FRAC; for (const f of ['spend','orders','revenue','clicks','landed']) A[f] *= k; return derive(A); }
+function waMorning() {
+  const rows = filterRows(waOpts,0,1), A = agg(rows), P = agg(filterRows(waOpts,1,1)), oth = otherAgg(1);
+  const L = leakOf(A), ch = groupBy(rows, r=>r.ch).sort((a,b)=>b.spend-a.spend), shop = state.connected.shopify;
+  const lps = groupBy(rows, r=>r.lp).filter(x=>x.clicks>A.clicks*.05).sort((a,b)=>a.landRate-b.landRate);
+  const gap = ch.slice().sort((a,b)=>b.overclaim-a.overclaim)[0], chg = P.roas ? (A.roas-P.roas)/P.roas*100 : 0;
+  return `<b>Good morning. Yesterday at ${esc(CONFIG.storeName)}</b>
+
+<b>Ad spend:</b> ${fmtINR(A.spend)}
+${ch.map(c=>`${chName(c.key)}: ${fmtINR(c.spend)}`).join('\n')}
+
+<b>${shop?'Shopify sales':'Sales from ads'}:</b> ${fmtINR(shop?A.revenue+oth.revenue:A.revenue)} from ${fmtN(shop?A.orders+oth.orders:A.orders)} orders
+<b>True ROAS:</b> ${x2(A.roas)} (${Math.abs(chg)<1?'flat':(chg>0?'up ':'down ')+Math.abs(chg).toFixed(0)+'%'} vs day before)
+
+<b>By channel</b>
+${ch.map(c=>`${chName(c.key)}: ${fmtN(c.orders)} orders, ROAS ${x2(c.roas)}`).join('\n')}
+
+<b>Worth a look</b>${shop&&gap?`\n- ${chName(gap.key)} claims ${fmtN(gap.claimed)} orders, Shopify confirms ${fmtN(gap.orders)} (+${pct(gap.overclaim,0)})`:''}${L?`\n- ${cap(L.bad(L.rate))}${lps[0]?`. Worst page: ${LPS[lps[0].key].name} (${LPS[lps[0].key].load}s load)`:''}`:''}
+
+Reply here with any question.`;
+}
+function waMidday() {
+  const A = dayAt(14);
+  return `<b>2 PM check</b>
+
+<b>Spend so far:</b> ${fmtINR(A.spend)}
+<b>Orders so far:</b> ${fmtN(A.orders)}
+<b>ROAS so far:</b> ${x2(A.roas)}
+
+On track for a normal day. Nothing else to flag.`;
+}
+function waEvening() {
+  const A = dayAt(20), rows = filterRows({...waOpts,range:0},0,0);
+  const camps = byCamp(rows).filter(c=>c.spend>A.spend*.04).sort((a,b)=>b.roas-a.roas);
+  return `<b>Day close. Today at ${esc(CONFIG.storeName)}</b>
+
+<b>Ad spend:</b> ${fmtINR(A.spend)}
+<b>Sales from ads:</b> ${fmtINR(A.revenue)} from ${fmtN(A.orders)} orders
+<b>True ROAS:</b> ${x2(A.roas)}
+${camps[0]?`\n<b>Best campaign</b>\n${esc(short(camps[0].c.name))}: ROAS ${x2(camps[0].roas)}`:''}${camps.length>1?`\n\n<b>Weakest campaign</b>\n${esc(short(camps[camps.length-1].c.name))}: ROAS ${x2(camps[camps.length-1].roas)}`:''}
+
+Full report in the dashboard. Good night.`;
+}
+function waAlert() {
+  const al = alertsFor(state.wa.mode, 1); if (!al.length) return null;
+  return `<b>Alert</b>\n\n${al.slice(0,3).map(a=>'- '+esc(a.text)).join('\n')}${al.length>3?`\n\n${al.length-3} more. Ask "anything wrong?" for the full list.`:''}`;
+}
+// scheduled messages for the bot chat and the team group, following the preview schedule
+function waScripted(id) {
+  const times = PREVIEW[state.wa.preview].times, m = [], bot = {bot:1};
+  if (id==='team') m.push({sys:`You added ${botName()}`});
+  if (times.includes('9:00 AM')) m.push({...bot, t:'9:00 AM', h:waMorning()});
+  const al = waAlert(); if (al) m.push({...bot, t:'11:42 AM', h:al});
+  if (id==='team') {
+    const g = groupBy(filterRows(waOpts,0,1), r=>r.ch).find(c=>c.key==='meta');
+    if (g && state.connected.shopify) { m.push({who:'Riya', t:'12:10 PM', h:`@${esc(botName())} Meta says how many orders yesterday vs Shopify?`});
+      m.push({...bot, t:'12:10 PM', h:`<b>Meta vs Shopify, yesterday</b>\n\nMeta reported: ${fmtN(g.claimed)} orders\nShopify confirmed: ${fmtN(g.orders)} orders\nOverclaim: +${pct(g.overclaim,0)}\n\n<b>True ROAS:</b> ${x2(g.roas)}\n<b>ROAS in Meta Ads Manager:</b> ${x2(g.platRoas)}`}); }
+    if (al) m.push({who:'Aman', t:'12:24 PM', h:'Pausing the weak ad set for today. Will swap the creatives tomorrow.'});
+  }
+  if (times.includes('2:00 PM')) m.push({...bot, t:'2:00 PM', h:waMidday()});
+  if (times.includes('8:00 PM')) m.push({...bot, t:'8:00 PM', h:waEvening()});
+  return m;
+}
+function waChats() {
+  const bot = {id:'bot', name:botName(), bot:1, verified:1, pinned:1}, team = {id:'team', name:CONFIG.storeName+' Team', group:1, bot:1};
+  return [bot, team, ...WA_PEOPLE];
+}
+function waMsgs(c) {
+  const base = c.bot ? waScripted(c.id) : c.hist.map(x=>x.me ? {me:1, t:x.t, h:esc(x.x)} : {who:x.who, c:x.c, t:x.t, h:esc(x.x)});
+  return base.concat(WA.live[c.id]||[]);
+}
+const plain = h => { const d = document.createElement('div'); d.innerHTML = h.replace(/\n+/g,' '); return d.textContent.trim(); };
+function waRow(c) {
+  const ms = waMsgs(c).filter(x=>!x.sys), last = ms[ms.length-1];
+  const unread = !WA.read[c.id] && c.unread, live = (WA.live[c.id]||[]).length;
+  const who = c.group && last ? (last.me ? 'You: ' : last.bot ? botName()+': ' : last.who ? last.who+': ' : '') : '';
+  const time = live ? last.t : c.bot ? (last ? last.t : '') : c.time;
+  return `<button class="wl-row" data-act="waOpen" data-id="${c.id}">${avatar(c)}<div class="tx">
+    <div class="l1"><span class="nm">${esc(c.name)}</span>${c.verified?`<span class="vf">${IC.verified}</span>`:''}<span class="tm ${unread?'new':''}">${esc(time)}</span></div>
+    <div class="l2">${last&&last.me?`<span class="vf">${IC.ticks}</span>`:''}<span class="pv">${esc(who + (last?plain(last.h):''))}</span>${unread?`<span class="badge">${c.unread}</span>`:c.pinned?`<span class="mt">${IC.pin}</span>`:c.muted?`<span class="mt">${IC.mute}</span>`:''}</div></div></button>`;
+}
+function waList() {
+  return `<div class="wl-h"><b>WhatsApp</b><div class="r"><button data-act="waLocked" aria-label="Camera">${IC.cam}</button><button data-act="waLocked" aria-label="Menu">${IC.dots}</button></div></div>
+    <div class="wl-s">${IC.search}<span>Search</span></div>
+    <div class="wl-c"><button class="on">All</button><button data-act="waLocked">Unread</button><button data-act="waLocked">Favorites</button><button data-act="waLocked">Groups</button></div>
+    <div class="wl-list">${waChats().map(waRow).join('')}</div>
+    <div class="wl-nav"><button class="on"><i>${IC.chats}</i>Chats</button><button class="lk" data-act="waLocked"><i>${IC.updates}</i>Updates</button><button class="lk" data-act="waLocked"><i>${IC.comm}</i>Communities</button><button class="lk" data-act="waLocked"><i>${IC.calls}</i>Calls</button></div>`;
+}
+function waBubble(m, prev) {
+  if (m.sys) return `<div class="wn">${esc(m.sys)}</div>`;
+  const cont = prev && !prev.sys && !!prev.me===!!m.me && prev.bot===m.bot && prev.who===m.who;
+  const g = WA.open && waChats().find(c=>c.id===WA.open).group;
+  const sn = g && !m.me && !cont ? `<span class="sn" style="color:${m.bot?'#1f7a4d':(TEAM.find(p=>p.n===m.who)||m).c||'#7c3aed'}">${esc(m.bot?botName():m.who)}</span>` : '';
+  return `<div class="wb ${m.me?'me':''} ${cont?'cont':''}">${sn}${m.h}${m.src?waSrc():''}<span class="ft">${esc(m.t)}${m.me?IC.ticks:''}</span></div>`;
+}
+function waChat() {
+  const c = waChats().find(x=>x.id===WA.open), ms = waMsgs(c), typing = WA.busy===c.id;
+  const sub = typing ? (c.group ? `${c.bot?botName():c.name} is typing...` : 'typing...') : c.id==='team' ? `You, ${TEAM.map(p=>p.n).join(', ')}, ${botName()}` : c.group ? 'tap here for group info' : c.bot ? 'Business account' : 'online';
+  const quick = c.bot ? ['What is today\'s ROAS?','Spend today','Which channel is overclaiming?','Anything wrong?','Summary of yesterday'] : [];
+  return `<div class="wc-h"><button data-act="waBack" aria-label="Back">${IC.back}</button>${avatar(c,1)}<div class="who"><b>${esc(c.name)}${c.verified?IC.verified:''}</b><span>${esc(sub)}</span></div><div class="r"><button data-act="waLocked" aria-label="Video call">${IC.video}</button><button data-act="waLocked" aria-label="Call">${IC.call}</button></div></div>
+    <div class="wc-b" id="waBody"><div class="wd">Today</div>${c.bot?`<div class="wn">Demo data. Numbers come from your connected sources.</div>`:''}${ms.map((m,i)=>waBubble(m, ms[i-1])).join('')}${typing?`<div class="wb"><span class="typing"><i></i><i></i><i></i></span></div>`:''}</div>
+    ${quick.length?`<div class="wq">${quick.map(q=>`<button data-act="waQuick" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`:''}
+    <form class="wc-in" id="waForm" autocomplete="off"><input id="waIn" placeholder="${c.bot?'Ask anything, e.g. aaj ka spend?':'Message'}"><button type="submit" aria-label="Send">${IC.send}</button></form>`;
+}
+function waDraw(scroll) {
+  const s = $('waScreen'); if (!s) return;
+  s.innerHTML = WA.open ? waChat() : waList();
+  if (WA.open && scroll!==false) { const b = $('waBody'); b.scrollTop = scroll==='top' ? 0 : b.scrollHeight; }
+}
+function waSend(q) {
+  q = q.trim(); const id = WA.open; if (!q || !id || WA.busy) return;
+  const c = waChats().find(x=>x.id===id), t = new Date().toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'}).toUpperCase();
+  (WA.live[id] ||= []).push({me:1, t, h:esc(q)}); WA.busy = id; waDraw();
+  setTimeout(() => {
+    const m = c.bot ? {bot:1, src:1, t, h:waReply(q)} : c.group ? {who:c.hist[0].who, c:c.hist[0].c, t, h:esc(c.replies[Math.floor(Math.random()*c.replies.length)])} : {t, h:esc(c.replies[Math.floor(Math.random()*c.replies.length)])};
+    WA.live[id].push(m); WA.busy = null; if (WA.open===id) waDraw();
+  }, c.bot ? 1100 : 1500 + Math.random()*900);
 }
 function viewWhatsApp() {
   if (!adChans().length) return needConnect();
-  const w = state.wa, times = scheduleTimes(), avg = avgDailySpend();
-  const learn = alertsFor('learn'), fixed = alertsFor('fixed'), cur = w.mode==='learn' ? learn : fixed;
-  const ydayAlerts = cur.filter(a=>a.d===0);
-  const radio = (k, o) => `<label class="opt ${w.freq===k?'on':''}" data-act="waFreq" data-k="${k}"><input type="radio" ${w.freq===k?'checked':''}><div><b>${o.label}</b><span>${o.desc}</span></div></label>`;
-  const msgs = [];
-  msgs.push(`<div class="wa-day">Today</div>`);
-  msgs.push(`<div class="wa-sys">${CONFIG.appName} bot was added by You · ${GROUP.members.length} members</div>`);
-  if (times.includes('9:00 AM')) msgs.push(`<div class="wa"><span class="who" style="color:#7c3aed">${CONFIG.appName}</span>${waFmt(waMessage())}<span class="tm">9:00 AM</span></div>`);
-  if (ydayAlerts[0]) msgs.push(`<div class="wa"><span class="who" style="color:#7c3aed">${CONFIG.appName}</span><b>🚨 Alert</b>\n${esc(ydayAlerts[0].text)}${ydayAlerts.length>1?`\n+${ydayAlerts.length-1} more — ask “anything wrong?”`:''}<span class="tm">11:42 AM</span></div>`);
-  if (state.connected.shopify) {
-    const g = groupBy(filterRows({range:1,channel:'all',campaign:'all',device:'all',lp:'all'},0,1), r=>r.ch).find(c=>c.key==='meta');
-    if (g) { msgs.push(`<div class="wa me"><span class="who" style="color:#c2410c">Riya — Marketing</span>@${CONFIG.appName} Meta says how many orders yesterday vs Shopify?<span class="tm">12:10 PM</span></div>`);
-      msgs.push(`<div class="wa"><span class="who" style="color:#7c3aed">${CONFIG.appName}</span>Meta reported <b>${fmtN(g.claimed)}</b> orders yesterday. Shopify matched <b>${fmtN(g.orders)}</b> to Meta clicks (+${pct(g.overclaim,0)} overclaim).\nTrue ROAS ${x2(g.roas)} vs ${x2(g.platRoas)} in Meta Ads Manager.<div class="src">Source: Shopify orders · Meta Ads</div><span class="tm">12:10 PM</span></div>`); }
-  }
-  if (times.includes('2:00 PM')) msgs.push(`<div class="wa"><span class="who" style="color:#7c3aed">${CONFIG.appName}</span>${waFmt(waAfternoon())}<span class="tm">2:00 PM</span></div>`);
-  for (const m of waLive) msgs.push(m.me ? `<div class="wa me"><span class="who" style="color:#047857">You</span>${esc(m.text)}<span class="tm">${m.t} ✓✓</span></div>` : `<div class="wa"><span class="who" style="color:#7c3aed">${CONFIG.appName}</span>${m.html}<span class="tm">${m.t}</span></div>`);
-  if (waBusy) msgs.push(`<div class="wa"><span class="typing"><i></i><i></i><i></i></span></div>`);
-  return `<p class="sub">The bot lives inside your team’s WhatsApp group. It posts on a schedule, flags problems as they happen, and anyone in the group can ask it a question.</p>
-  <div class="grid g2">
-    <div class="grid" style="align-content:start">
-      <div class="card"><div class="card-h"><h3>Group</h3><span class="hint">${GROUP.members.length} members</span></div><div class="card-b">
-        <div class="set-row"><div><b>${esc(GROUP.name())}</b><span>${GROUP.members.join(' · ')}</span></div><button class="btn sm" data-act="waInvite">Invite link</button></div>
-        <div class="set-row"><div><b>Weekly summary — Monday 9:00 AM</b><span>Week-over-week by channel, campaign and landing page</span></div><button class="tog ${w.weekly?'on':''}" data-act="waTog" data-k="weekly" aria-label="Weekly summary"></button></div>
-      </div></div>
-      <div class="card"><div class="card-h"><h3>How often it posts</h3><span class="hint">Your spend: ~${fmtINR(avg)}/day</span></div><div class="card-b">
-        ${Object.entries(FREQ).map(([k,o])=>radio(k,o)).join('')}
-        <div class="note">Posting at <b>${times.join(' · ')}</b>${w.freq==='auto'?` (your spend is ${avg>50000?'above':'below'} ₹50k/day)`:''}. Between posts it stays quiet unless an alert fires.</div>
-      </div></div>
-      <div class="card"><div class="card-h"><h3>When to raise an alert</h3></div><div class="card-b">
-        <label class="opt ${w.mode==='learn'?'on':''}" data-act="waMode" data-k="learn"><input type="radio" ${w.mode==='learn'?'checked':''}><div><b>Learn this brand’s normal (recommended)</b><span>Alerts only when a number breaks from its own range over the last 4 weeks. Fewer false alarms.</span></div></label>
-        <label class="opt ${w.mode==='fixed'?'on':''}" data-act="waMode" data-k="fixed"><input type="radio" ${w.mode==='fixed'?'checked':''}><div><b>Fixed rules</b><span>Alert when a number crosses a limit you set.</span></div></label>
-        ${w.mode==='fixed'?`<div class="ths"><label>Campaign ROAS below<input type="number" step="0.1" data-th="roas" value="${w.th.roas}"></label><label>Spend jump above (%)<input type="number" data-th="spend" value="${w.th.spend}"></label><label>Platform vs Shopify gap (%)<input type="number" data-th="gap" value="${w.th.gap}"></label></div>`:''}
-        <div style="display:flex;gap:16px;align-items:flex-end;margin-top:6px"><div><div class="bigcount">${cur.length}</div><div style="font-size:12.5px;color:var(--ink2)">alerts in the last 7 days</div></div>
-        <div style="font-size:12.5px;color:var(--ink2)">${w.mode==='learn'?`Fixed rules would have sent <b>${fixed.length}</b>.`:`Learning mode would have sent <b>${learn.length}</b>.`}</div></div>
-        <ul class="alist">${cur.slice(0,6).map(a=>`<li><span class="when">${dayLabel(a.d)}</span><span>${esc(a.text)}</span></li>`).join('')}${cur.length>6?`<li><span class="when"></span><span style="color:var(--ink3)">+${cur.length-6} more</span></li>`:''}</ul>
-      </div></div>
-    </div>
-    <div><div class="phone"><div class="ph"><div class="ai-av" style="width:34px;height:34px;border-radius:50%;background:#128c7e">👥</div><div><b>${esc(GROUP.name())}</b><span>${GROUP.members.map(m=>m.split(' ')[0]).join(', ')}, ${CONFIG.appName}</span></div></div>
-      <div class="pb" id="waBody">${msgs.join('')}</div>
-      <form class="wa-in" id="waForm" autocomplete="off"><input id="waIn" placeholder="Ask the bot… e.g. aaj ka spend?"><button type="submit" aria-label="Send">➤</button></form></div>
-      <div style="text-align:center;font-size:12px;color:var(--ink3);margin-top:10px">Type a question to try it live — same answers as Ask AI</div></div>
+  const p = state.wa.preview;
+  return `<div class="wa-page">
+    <div class="wa-prev"><span class="lbl">Preview how often the bot posts</span><div class="seg">${Object.entries(PREVIEW).map(([k,o])=>`<button class="${p===k?'on':''}" data-act="waPreview" data-k="${k}">${o.label}</button>`).join('')}</div></div>
+    <div class="iph"><div class="isl"></div><div class="ist"><span>9:41</span><span class="ic"><svg width="18" height="12" viewBox="0 0 18 12" fill="#111"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="#111"><path d="M8 12l2.6-3.2a4 4 0 0 0-5.2 0zM3.6 6.6a7 7 0 0 1 8.8 0l1.6-2a9.6 9.6 0 0 0-12 0zM.5 2.8a12 12 0 0 1 15 0L16 2.2A13 13 0 0 0 0 2.2z"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="#111" opacity=".4"/><rect x="2" y="2" width="19" height="8" rx="1.8" fill="#111"/><rect x="24" y="4" width="1.6" height="4" rx=".8" fill="#111" opacity=".4"/></svg></span></div>
+      <div id="waScreen"></div><div class="home"></div></div>
   </div>`;
 }
-function waAsk(q) {
-  q = q.trim(); if (!q || waBusy) return;
-  const t = new Date().toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'});
-  waLive.push({me:true, text:q, t}); waBusy = true; render(); scrollWa();
-  setTimeout(()=>{ let html; try { html = answer(q); } catch(e) { html = 'Sorry, I couldn’t read that. Try asking another way.'; }
-    waLive.push({html: html + srcLine(), t}); waBusy = false; render(); scrollWa(); }, 900);
-}
-function scrollWa() { const b = $('waBody'); if (b) b.scrollTop = b.scrollHeight; }
 
 /* ---------- Settings ---------- */
 function viewSettings() {
@@ -1295,7 +1422,7 @@ function ask(q) {
 function openChat() {
   if (!adChans().length) { state.view='integrations'; render(); toast('Connect an ad account first'); return; }
   if (state.view==='ask') return;
-  $('drawer').classList.add('on'); $('drawerBody').appendChild($('chat')); $('fab').style.display='none';
+  $('drawer').classList.add('on'); $('drawerBody').appendChild($('chat'));
   renderChat(); setTimeout(()=>$('chatIn').focus(), 250);
 }
 function closeChat() { $('drawer').classList.remove('on'); $('chatHolder').appendChild($('chat')); render(); }
@@ -1330,10 +1457,11 @@ document.addEventListener('click', e => {
     case 'openChat': openChat(); break;
     case 'closeChat': closeChat(); break;
     case 'expandChat': $('drawer').classList.remove('on'); state.view='ask'; render(); renderChat(); break;
-    case 'waTog': state.wa[a.dataset.k] = !state.wa[a.dataset.k]; render(); break;
-    case 'waFreq': e.preventDefault(); state.wa.freq = a.dataset.k; render(); break;
-    case 'waMode': e.preventDefault(); state.wa.mode = a.dataset.k; render(); break;
-    case 'waInvite': toast('Invite link copied — add the bot to any WhatsApp group'); break;
+    case 'waPreview': state.wa.preview = a.dataset.k; render(); break;
+    case 'waOpen': WA.open = a.dataset.id; WA.read[a.dataset.id] = 1; waDraw(); break;
+    case 'waBack': WA.open = null; waDraw(); break;
+    case 'waQuick': waSend(a.dataset.q); break;
+    case 'waLocked': toast('Only Chats works in this demo'); break;
     case 'saveSettings': {
       const n = $('setName').value.trim(); const be = parseFloat($('setBe').value);
       if (n) { CONFIG.storeName = n; state.storeName = n; }
@@ -1344,9 +1472,8 @@ document.addEventListener('click', e => {
       state = DEFAULT_STATE(); CONFIG.storeName = 'Kesar Lane'; $('drawer').classList.remove('on'); render(); toast('Workspace reset'); break;
   }
 });
-document.addEventListener('submit', e => { if (e.target.id==='waForm') { e.preventDefault(); const v = $('waIn').value; $('waIn').value=''; waAsk(v); } });
+document.addEventListener('submit', e => { if (e.target.id==='waForm') { e.preventDefault(); waSend($('waIn').value); } });
 document.addEventListener('change', e => {
-  const th = e.target.closest('[data-th]'); if (th) { const v = parseFloat(th.value); if (v>0) { state.wa.th[th.dataset.th] = v; render(); } return; }
   const s = e.target.closest('[data-filter]'); if (!s) return;
   const k = s.dataset.filter; state.filters[k] = k==='range' ? +s.value : s.value;
   if (k==='channel') state.filters.campaign = 'all';
